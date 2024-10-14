@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "814448882111",
+    "project_id": "kramat-djati-b2c10",
+    "storage_bucket": "kramat-djati-b2c10.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814448882111:android:30d93abc76d1f33c02b10a",
+        "android_client_info": {
+          "package_name": "com.example.keramat_djati"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByv1rSoyTqaGzHC1wZuQT3xkjkR1zXnSw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

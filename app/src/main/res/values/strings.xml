@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">KERAMAT_DJATI</string>
+    <string name="main_green_box_background">Main green box background</string>
+    <string name="icon_layered_on_top_of_the_box">Icon layered on top of the box</string>
+    <string name="login_email">Enter your email</string>
+    <string name="welcome">Welcome!</string>
+    <string name="email_login_text">Email</string>
+    <string name="password_login_text">Password</string>
+    <string name="login_password">Enter password</string>
+    <string name="login_button">Login</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="register_text">Register</string>
+    <string name="re_enter_password">Re-enter password</string>
 </resources>
