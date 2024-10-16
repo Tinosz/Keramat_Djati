@@ -11,4 +11,13 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="register_text">Register</string>
     <string name="re_enter_password">Re-enter password</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_a_new_wallet">Create a New Wallet</string>
+    <string name="wallet_name_input_box">Wallet Name</string>
+    <string name="enter_a_wallet_name_input">Enter a wallet name</string>
+    <string name="next_button_text">Next</string>
+    <string name="dont_have_an_account_register_here">Dont have an account? Register here.</string>
+    <string name="wallet_balance">Wallet Balance</string>
+    <string name="enter_your_wallet_balance">Enter your wallet balance</string>
 </resources>

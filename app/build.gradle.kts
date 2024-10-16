@@ -43,6 +43,18 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // Java language implementation
+    implementation(libs.androidx.fragment)
+    // Kotlin
+    implementation(libs.androidx.fragment.ktx)
+    // Compose
+    implementation(libs.androidx.fragment.compose)
+
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.activity.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -53,6 +65,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.androidx.camera.view)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
