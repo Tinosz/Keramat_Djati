@@ -87,7 +87,7 @@ class Login : AppCompatActivity() {
 
         // Set the spannable string to the TextView
         registerTextView.text = spannableString
-        registerTextView.movementMethod = LinkMovementMethod.getInstance()  // Enable link handling
+        registerTextView.movementMethod = LinkMovementMethod.getInstance() // Make the link clickable
     }
 
     private fun loginFirebase(email: String, password: String) {
@@ -95,7 +95,7 @@ class Login : AppCompatActivity() {
             .addOnCompleteListener(this){
                 if (it.isSuccessful){
                     Toast.makeText(this, "Welcome $email", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, CreateWalletActivity::class.java) // Change to the next activity
                     startActivity(intent)
                 } else {
                     Toast.makeText(this, "${it.exception?.message}", Toast.LENGTH_SHORT).show()
