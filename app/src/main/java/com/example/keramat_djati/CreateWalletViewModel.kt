@@ -5,5 +5,5 @@ import androidx.lifecycle.ViewModel
 
 class CreateWalletViewModel : ViewModel() {
     val walletName = MutableLiveData<String>()
-    val walletAmount = MutableLiveData<Int>()
+    val walletAmount = MutableLiveData<Long>()
 }

@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -16,7 +17,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.keramat_djati.databinding.ActivityLoginBinding
+import com.example.keramat_djati.transaction.TransactionActivityHost
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class Login : AppCompatActivity() {
 
@@ -92,14 +95,56 @@ class Login : AppCompatActivity() {
 
     private fun loginFirebase(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this){
-                if (it.isSuccessful){
-                    Toast.makeText(this, "Welcome $email", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, CreateWalletActivity::class.java) // Change to the next activity
-                    startActivity(intent)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                    checkAndInitializedUserData(userId, email)
                 } else {
-                    Toast.makeText(this, "${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                    Log.d("LoginError", "Login failed: ${task.exception?.message}")
+                    Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
+    private fun checkAndInitializedUserData(userId: String, email: String) {
+        val userDocRef = FirebaseFirestore.getInstance().collection("accounts").document(userId)
+        val walletsRef = userDocRef.collection("wallets")
+
+        // First, check if there are any wallets
+        walletsRef.get().addOnCompleteListener { walletTask ->
+            if (walletTask.isSuccessful) {
+                val walletSnapshot = walletTask.result
+                if (!walletSnapshot.isEmpty) {
+                    // Wallets exist, navigate to MainActivity
+                    Log.d("LoginFlow", "Returning user with wallets, navigate to MainActivity")
+                    startActivity(Intent(this, TransactionActivityHost::class.java))
+                    finish()
+                } else {
+                    // No wallets found, now check user document for first login flag
+                    userDocRef.get().addOnSuccessListener { document ->
+                        if (document.exists() && document.getBoolean("isFirstLogin") == true) {
+                            // Handle first-time login
+                            userDocRef.update("isFirstLogin", false).addOnSuccessListener {
+                                Log.d("LoginFlow", "First login, navigate to CreateWalletActivity")
+                                startActivity(Intent(this, CreateWalletActivity::class.java))
+                                finish()
+                            }
+                        } else {
+                            // No wallets and not first login, still go to CreateWalletActivity
+                            Log.d("LoginFlow", "No wallets found, navigate to CreateWalletActivity")
+                            startActivity(Intent(this, CreateWalletActivity::class.java))
+                            finish()
+                        }
+                    }.addOnFailureListener {
+                        Log.e("LoginFlow", "Failed to get user document: ${it.message}")
+                        Toast.makeText(this, "Error checking user status", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Log.e("LoginFlow", "Failed to check wallets: ${walletTask.exception?.message}")
+                Toast.makeText(this, "Error checking wallets", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }

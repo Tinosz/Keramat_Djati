@@ -45,7 +45,7 @@ android {
 dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-
+    implementation(libs.material)
     // Java language implementation
     implementation(libs.androidx.fragment)
     // Kotlin
@@ -68,4 +68,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.androidx.cardview)
 }
