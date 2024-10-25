@@ -45,7 +45,7 @@ android {
 dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-
+    implementation(libs.material)
     // Java language implementation
     implementation(libs.androidx.fragment)
     // Kotlin
@@ -69,13 +69,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-
-    // CameraX core library
+    implementation(libs.androidx.cardview)
     implementation (libs.androidx.camera.camera2)
     implementation (libs.androidx.camera.lifecycle)
     implementation (libs.androidx.camera.view.v100alpha31)
     implementation (libs.text.recognition)
-
-
 }

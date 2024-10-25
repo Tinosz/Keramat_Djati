@@ -6,6 +6,7 @@ import android.text.SpannableString
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.TextView
@@ -17,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.keramat_djati.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class Register : AppCompatActivity() {
 
@@ -130,13 +132,75 @@ class Register : AppCompatActivity() {
             "createdAt" to com.google.firebase.Timestamp.now()
         )
 
+        val db = FirebaseFirestore.getInstance()
         db.collection("accounts").document(userId)
             .set(accountData)
             .addOnSuccessListener {
                 Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show()
+                initializeCategories(userId)  // Initialize categories right after account creation
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to create account: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun initializeCategories(userId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        val expenseCategories = listOf(
+            "Groceries",
+            "Bills",
+            "Transportation",
+            "Entertainment",
+            "Health",
+            "Education"
+        )
+
+        val incomeCategories = listOf(
+            "Salary",
+            "Gifts",
+            "Investments",
+            "Sales",
+            "Other"
+        )
+
+        // Create the Expense and Income documents first with a generic field to ensure they exist
+        val expenseDocData = mapOf("type" to "Expense")
+        val incomeDocData = mapOf("type" to "Income")
+
+        // Create or update 'Expense' document before adding details
+        db.collection("accounts").document(userId).collection("categories").document("Expense")
+            .set(expenseDocData, SetOptions.merge())
+            .addOnSuccessListener {
+                // Now add each expense category
+                expenseCategories.forEach { categoryName ->
+                    val categoryData = mapOf("name" to categoryName)
+                    db.collection("accounts").document(userId).collection("categories")
+                        .document("Expense").collection("Details").add(categoryData)
+                        .addOnSuccessListener {
+                            Log.d("InitCategories", "Expense category created successfully with ID: ${it.id}")
+                        }
+                        .addOnFailureListener {
+                            Log.e("InitCategories", "Failed to create expense category: ${it.message}")
+                        }
+                }
+            }
+
+        db.collection("accounts").document(userId).collection("categories").document("Income")
+            .set(incomeDocData, SetOptions.merge())
+            .addOnSuccessListener {
+                // Now add each income category
+                incomeCategories.forEach { categoryName ->
+                    val categoryData = mapOf("name" to categoryName)
+                    db.collection("accounts").document(userId).collection("categories")
+                        .document("Income").collection("Details").add(categoryData)
+                        .addOnSuccessListener {
+                            Log.d("InitCategories", "Income category created successfully with ID: ${it.id}")
+                        }
+                        .addOnFailureListener {
+                            Log.e("InitCategories", "Failed to create income category: ${it.message}")
+                        }
+                }
             }
     }
 }

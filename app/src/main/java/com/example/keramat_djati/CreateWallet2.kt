@@ -101,7 +101,12 @@ class CreateWallet2 : Fragment() {
             }
         })
         doneButton.setOnClickListener{
-            saveWalletToFireStore()
+            if(getPlainWalletBalance() > 0){
+                viewModel.walletAmount.value = getPlainWalletBalance()
+                (activity as? CreateWalletActivity)?.saveWallet()
+            } else {
+                Toast.makeText(requireContext(), "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+            }
         }
 
         return view
@@ -114,36 +119,7 @@ class CreateWallet2 : Fragment() {
         return decimalFormat.format(number)
     }
 
-    private fun saveWalletToFireStore(){
-        val walletName = viewModel.walletName.value ?: "Unnamed Wallet"
-        val walletAmount = getPlainWalletBalance()
 
-        val userId = auth.currentUser?.uid
-        if (userId != null){
-            val walletId = UUID.randomUUID().toString()
-
-            val walletData = mapOf(
-                "name" to walletName,
-                "amount" to walletAmount
-            )
-
-            db.collection("accounts").document(userId)
-                .collection("wallets").document(walletId)
-                .set(walletData)
-                .addOnSuccessListener{
-                    Toast.makeText(requireContext(), "Wallet created successfully", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(requireActivity(), MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                    requireActivity().finish() // Close CreateWalletActivity
-                }
-                .addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to create wallet: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     fun getPlainWalletBalance(): Long {
         val rawInput = walletBalanceEditText.text.toString()
