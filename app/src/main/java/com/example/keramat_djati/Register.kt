@@ -16,11 +16,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.keramat_djati.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class Register : AppCompatActivity() {
 
-    lateinit var binding : ActivityRegisterBinding
-    lateinit var auth : FirebaseAuth
+    lateinit var binding: ActivityRegisterBinding
+    lateinit var auth: FirebaseAuth
+    lateinit var db: FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
@@ -33,44 +36,45 @@ class Register : AppCompatActivity() {
         }
 
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()  // Initialize Firestore
 
-        binding.registerButton.setOnClickListener{
+        binding.registerButton.setOnClickListener {
             val email = binding.registerEmail.text.toString()
             val password = binding.registerPassword.text.toString()
             val passwordConfirmation = binding.registerPasswordConfirmation.text.toString()
 
-            //rules
-            if(email.isEmpty()){
+            // Validation rules
+            if (email.isEmpty()) {
                 binding.registerEmail.error = "Email is required"
                 binding.registerEmail.requestFocus()
                 return@setOnClickListener
             }
 
-            if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 binding.registerEmail.error = "Please enter a valid email"
                 binding.registerEmail.requestFocus()
                 return@setOnClickListener
             }
 
-            if(password.isEmpty()){
+            if (password.isEmpty()) {
                 binding.registerPassword.error = "Password is required"
                 binding.registerPassword.requestFocus()
                 return@setOnClickListener
             }
 
-            if(passwordConfirmation.isEmpty()){
+            if (passwordConfirmation.isEmpty()) {
                 binding.registerPasswordConfirmation.error = "Password confirmation is required"
                 binding.registerPasswordConfirmation.requestFocus()
                 return@setOnClickListener
             }
 
-            if(password != passwordConfirmation){
+            if (password != passwordConfirmation) {
                 binding.registerPassword.error = "Password does not match"
                 binding.registerPassword.requestFocus()
                 return@setOnClickListener
             }
 
-            if(password.length < 6){
+            if (password.length < 6) {
                 binding.registerPassword.error = "Password must be at least 6 characters"
                 binding.registerPassword.requestFocus()
                 return@setOnClickListener
@@ -82,8 +86,8 @@ class Register : AppCompatActivity() {
         val loginTextView = findViewById<TextView>(R.id.login_text)
         val spannableString = SpannableString("Already have an account? Login here.")
 
-        val clickableSpan = object : ClickableSpan(){
-            override fun onClick(widget: View){
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
                 val intent = Intent(this@Register, Login::class.java)
                 startActivity(intent)
             }
@@ -100,17 +104,39 @@ class Register : AppCompatActivity() {
         loginTextView.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    private fun registerFirebase(email: String, password: String){
+    // Function to register user and create Firestore account entry
+    private fun registerFirebase(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this){
-                if(it.isSuccessful){
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    user?.let {
+                        val userId = it.uid  // Get UID of the registered user
+                        createFirestoreAccount(userId, email)  // Create Firestore entry
+                    }
                     Toast.makeText(this, "Register Success", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, Login::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, Login::class.java))
                 } else {
-                    Toast.makeText(this, "Register Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Register Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
-}
 
+    // Function to create account document in Firestore
+    private fun createFirestoreAccount(userId: String, email: String) {
+        val accountData = hashMapOf(
+            "userId" to userId,
+            "email" to email,
+            "createdAt" to com.google.firebase.Timestamp.now()
+        )
+
+        db.collection("accounts").document(userId)
+            .set(accountData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to create account: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+}
