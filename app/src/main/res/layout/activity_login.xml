@@ -42,7 +42,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="35dp"
             android:layout_marginBottom="50dp"
             android:gravity="center"
             android:text="@string/welcome"
@@ -97,11 +97,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/login_button"
-            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:background="@drawable/button_rounded"
-            app:backgroundTint="@color/main_green"
+            android:backgroundTint="@color/main_green"
             />
         <TextView
             android:id="@+id/register_text"
@@ -109,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:gravity="center"
-            android:text="@string/dont_have_an_account_register_here"
+            android:text="Dont have an account? Register here."
             android:textSize="16sp" /> <!-- Clickable text on Login.kt file -->
     </LinearLayout>
 
