@@ -117,7 +117,7 @@ class Login : AppCompatActivity() {
                 if (!walletSnapshot.isEmpty) {
                     // Wallets exist, navigate to MainActivity
                     Log.d("LoginFlow", "Returning user with wallets, navigate to MainActivity")
-                    startActivity(Intent(this, TransactionActivityHost::class.java))
+                    startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 } else {
                     // No wallets found, now check user document for first login flag

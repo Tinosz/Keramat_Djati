@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -43,14 +44,17 @@ class TransactionFragment1 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         loadWallets()
         setupCategorySpinner()
 
-        view.findViewById<Spinner>(R.id.spinner_categories).post {
-            val defaultCategory = view.findViewById<Spinner>(R.id.spinner_categories).selectedItem as String
-            viewModel.categoryType.value = defaultCategory
-        }
 
+
+        // Set the selected category in the spinner
+        val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_categories)
+        val category = viewModel.categoryType.value
+        val position = (spinnerCategories.adapter as ArrayAdapter<String>).getPosition(category)
+        spinnerCategories.setSelection(position)
 
         view.findViewById<Button>(R.id.next_button).setOnClickListener {
             val selectedCategory = viewModel.categoryType.value
@@ -64,8 +68,8 @@ class TransactionFragment1 : Fragment() {
         view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
             navigateToMainActivity()
         }
-
     }
+
 
     private fun navigateToMainActivity() {
         val intent = Intent(requireContext(), MainActivity::class.java)
