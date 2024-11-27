@@ -3,7 +3,7 @@ package com.example.keramat_djati
 object TextProcessingUtils {
 
     // This function filters and cleans up the OCR blocks
-    fun filterRelevantTextBlocks(blocks: List<TextBlock>): List<TextBlock> {
+    private fun filterRelevantTextBlocks(blocks: List<TextBlock>): List<TextBlock> {
         return blocks.filter { block ->
             // Remove empty blocks and blocks with only symbols or special characters
             block.text.isNotEmpty() && block.text.matches("^[a-zA-Z0-9\\s,.]+$".toRegex())
@@ -11,7 +11,7 @@ object TextProcessingUtils {
     }
 
     // This function normalizes the text by removing non-alphanumeric characters and trimming spaces
-    fun normalizeText(blocks: List<TextBlock>): List<TextBlock> {
+    private fun normalizeText(blocks: List<TextBlock>): List<TextBlock> {
         return blocks.map { block ->
             val cleanText = block.text.trim().replace("[^\\w\\s]".toRegex(), "")  // Remove non-alphanumeric characters
             block.copy(text = cleanText)
@@ -19,12 +19,12 @@ object TextProcessingUtils {
     }
 
     // This function sorts text blocks by vertical position (Y coordinate)
-    fun sortTextBlocksByVerticalPosition(blocks: List<TextBlock>): List<TextBlock> {
+    private fun sortTextBlocksByVerticalPosition(blocks: List<TextBlock>): List<TextBlock> {
         return blocks.sortedBy { it.y }
     }
 
     // This function groups text blocks by horizontal spacing (blocks that are too far apart are not grouped together)
-    fun filterTextBlocksByHorizontalSpacing(blocks: List<TextBlock>, threshold: Int = 100): List<List<TextBlock>> {
+    private fun filterTextBlocksByHorizontalSpacing(blocks: List<TextBlock>, threshold: Int = 100): List<List<TextBlock>> {
         val groupedBlocks = mutableListOf<MutableList<TextBlock>>()
         var currentGroup = mutableListOf<TextBlock>()
         var lastX = blocks.first().x
@@ -47,7 +47,7 @@ object TextProcessingUtils {
     }
 
     // Format text blocks into receipt items (only item name and price)
-    fun formatTextBlocksToReceiptItems(groupedTextBlocks: List<List<TextBlock>>): List<ReceiptItem> {
+    private fun formatTextBlocksToReceiptItems(groupedTextBlocks: List<List<TextBlock>>): List<ReceiptItem> {
         return groupedTextBlocks.mapNotNull { group ->
             val line = group.joinToString(" ") { it.text }
 
