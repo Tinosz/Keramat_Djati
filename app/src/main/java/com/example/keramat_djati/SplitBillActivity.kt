@@ -87,13 +87,12 @@ class SplitBillActivity : AppCompatActivity() {
                 val blocks = convertVisionTextToTextBlocks(visionText)
                 val groupedTextBlocks = TextProcessingUtils.filterAndGroupTextBlocks(blocks)
 
-                // Create a formatted string from grouped text blocks to display
-                val formattedText = groupedTextBlocks.entries.joinToString("\n") { entry ->
-                    "Line ${entry.key}: ${entry.value.joinToString { it.text }}"
-                }
+                // Format the grouped text blocks to receipt items
+                val receiptItems = TextProcessingUtils.formatTextBlocksToReceiptItems(groupedTextBlocks)
 
+                // Send receiptItems to SplitBillDisplayActivity
                 val intent = Intent(this, SplitBillDisplayActivity::class.java).apply {
-                    putExtra("recognizedText", formattedText)
+                    putParcelableArrayListExtra("receiptItems", ArrayList(receiptItems))  // Pass the list of items
                 }
                 startActivity(intent)
             }
@@ -101,6 +100,7 @@ class SplitBillActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error recognizing text: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun convertVisionTextToTextBlocks(visionText: com.google.mlkit.vision.text.Text): List<TextBlock> {
         val textBlocks = mutableListOf<TextBlock>()
