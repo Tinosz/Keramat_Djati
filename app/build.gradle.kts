@@ -57,6 +57,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
 
 
+    implementation(libs.vision.common)
+    implementation(libs.play.services.mlkit.text.recognition.common)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

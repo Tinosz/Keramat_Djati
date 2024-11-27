@@ -20,4 +20,14 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"/>
 
+    <Button
+        android:id="@+id/button_process_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Process Image"
+        android:layout_below="@+id/button_capture"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+
 </RelativeLayout>
