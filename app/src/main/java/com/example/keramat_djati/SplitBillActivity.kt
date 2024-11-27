@@ -87,14 +87,13 @@ class SplitBillActivity : AppCompatActivity() {
             .addOnSuccessListener { visionText ->
                 Log.d("OCR", "Recognized text: ${visionText.text}")
                 val blocks = convertVisionTextToTextBlocks(visionText)
-                val groupedTextBlocks = TextProcessingUtils.filterAndGroupTextBlocks(blocks)
 
-                // Format the grouped text blocks to receipt items
-                val receiptItems = TextProcessingUtils.formatTextBlocksToReceiptItems(groupedTextBlocks)
+                // Preprocess OCR blocks before passing to item formatting
+                val processedItems = TextProcessingUtils.processReceipt(blocks)
 
                 // Send receiptItems to SplitBillDisplayActivity
                 val intent = Intent(this, SplitBillDisplayActivity::class.java).apply {
-                    putParcelableArrayListExtra("receiptItems", ArrayList(receiptItems))  // Pass the list of items
+                    putParcelableArrayListExtra("receiptItems", ArrayList(processedItems))  // Pass the list of items
                 }
                 startActivity(intent)
             }
@@ -102,7 +101,6 @@ class SplitBillActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error recognizing text: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun convertVisionTextToTextBlocks(visionText: com.google.mlkit.vision.text.Text): List<TextBlock> {
         val textBlocks = mutableListOf<TextBlock>()
