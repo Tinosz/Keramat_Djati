@@ -8,15 +8,18 @@ object TextProcessingUtils {
     fun filterAndGroupTextBlocks(blocks: List<TextBlock>): Map<Int, List<TextBlock>> {
         if (blocks.isEmpty()) return emptyMap()
 
-        val lines = blocks.groupBy { it.y / 10 }
+        // Group text blocks by their Y coordinate, making sure items appear together vertically
+        val lines = blocks.groupBy { it.y / 10 }  // Adjust the threshold (20) if needed
 
         val refinedGroups = mutableMapOf<Int, MutableList<TextBlock>>()
         lines.entries.forEach { (key, textBlocks) ->
-            val sortedBlocks = textBlocks.sortedBy { it.x }
+            val sortedBlocks = textBlocks.sortedBy { it.x }  // Sort by horizontal X to maintain item order
+
             val dynamicGroups = mutableListOf<List<TextBlock>>()
             var currentGroup = mutableListOf<TextBlock>()
-
             var lastX = sortedBlocks.first().x
+
+            // Group text blocks horizontally that are close enough
             sortedBlocks.forEach { block ->
                 if ((block.x - lastX) > calculateImprovedThreshold(sortedBlocks)) {
                     dynamicGroups.add(currentGroup)
@@ -25,8 +28,10 @@ object TextProcessingUtils {
                 currentGroup.add(block)
                 lastX = block.x
             }
+
             if (currentGroup.isNotEmpty()) dynamicGroups.add(currentGroup)
 
+            // Store the groups by Y position
             refinedGroups[key] = dynamicGroups.flatten().toMutableList()
         }
 
@@ -36,22 +41,31 @@ object TextProcessingUtils {
     private fun calculateImprovedThreshold(blocks: List<TextBlock>): Int {
         val distances = blocks.zipWithNext { a, b -> b.x - a.x }
         val averageDistance = if (distances.isNotEmpty()) distances.average() else 100.0
-        return (averageDistance * 1.2).toInt() // Adjust this factor based on actual data
+        return (averageDistance * 1.2).toInt() // Adjust the factor as necessary based on data
     }
 
-    // Format text blocks into receipt items
+
     fun formatTextBlocksToReceiptItems(groupedTextBlocks: Map<Int, List<TextBlock>>): List<ReceiptItem> {
         return groupedTextBlocks.entries.sortedBy { it.key }
             .mapNotNull { entry ->
                 val line = entry.value.joinToString(" ") { it.text }
-                val parts = line.split("\\s+".toRegex()).takeLast(2) // Assuming the last two elements are price and quantity
-                if (parts.size == 2) {
+
+                // Split the line into parts, expecting price to be the last part
+                val parts = line.split("\\s+".toRegex())
+
+                // Ensure there's at least one part for the name and another for the price
+                if (parts.isNotEmpty()) {
                     try {
-                        val quantity = parts[0].toInt()  // Parse quantity as an integer
-                        val price = parts[1].filter { it.isDigit() || it == ',' }.replace(',', '.').toDouble()
-                        val name = line.removeSuffix(parts.joinToString(" "))
-                        ReceiptItem(name, quantity, price, quantity * price)  // Total is calculated as quantity * price
+                        // Extract item name (everything except the last part)
+                        val name = parts.dropLast(1).joinToString(" ")
+                        // Extract the price (last part)
+                        val priceStr = parts.last().filter { it.isDigit() || it == '.' }  // Clean price string (e.g., remove currency symbols)
+                        val price = priceStr.toDouble()
+
+                        // Create the ReceiptItem with name and price
+                        ReceiptItem(itemName = name, price = price, total = price)  // Since no quantity, total = price
                     } catch (e: NumberFormatException) {
+                        // If the price parsing fails, ignore this entry
                         null
                     }
                 } else {
@@ -59,4 +73,5 @@ object TextProcessingUtils {
                 }
             }
     }
+
 }

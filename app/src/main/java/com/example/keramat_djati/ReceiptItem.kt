@@ -6,7 +6,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class ReceiptItem(
     val itemName: String,
-    val quantity: Int,  // Change quantity to Int
     val price: Double,
-    val total: Double
+    val total: Double = price  // Total is just the price if no quantity is involved
 ) : Parcelable

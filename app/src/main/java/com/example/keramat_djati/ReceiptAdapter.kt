@@ -10,9 +10,7 @@ class ReceiptAdapter(private var items: List<ReceiptItem>) : RecyclerView.Adapte
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemName: TextView = itemView.findViewById(R.id.textViewItemName)
-        val quantity: TextView = itemView.findViewById(R.id.textViewQuantity)
-        val price: TextView = itemView.findViewById(R.id.textViewPrice)
-        val total: TextView = itemView.findViewById(R.id.textViewTotal)
+        val price: TextView = itemView.findViewById(R.id.textViewTotal)  // Display the total price
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -22,10 +20,8 @@ class ReceiptAdapter(private var items: List<ReceiptItem>) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.itemName.text = item.itemName
-        holder.quantity.text = item.quantity.toString()  
-        holder.price.text = item.price.toString()
-        holder.total.text = item.total.toString()
+        holder.itemName.text = item.itemName  // Set item name
+        holder.price.text = item.total.toString()  // Set total price
     }
 
     override fun getItemCount(): Int = items.size

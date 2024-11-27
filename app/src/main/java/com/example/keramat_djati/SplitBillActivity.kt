@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -84,6 +85,7 @@ class SplitBillActivity : AppCompatActivity() {
 
         recognizer.process(inputImage)
             .addOnSuccessListener { visionText ->
+                Log.d("OCR", "Recognized text: ${visionText.text}")
                 val blocks = convertVisionTextToTextBlocks(visionText)
                 val groupedTextBlocks = TextProcessingUtils.filterAndGroupTextBlocks(blocks)
 
