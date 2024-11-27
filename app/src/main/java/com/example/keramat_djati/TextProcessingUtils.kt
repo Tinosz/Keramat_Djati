@@ -41,36 +41,22 @@ object TextProcessingUtils {
 
     // Format text blocks into receipt items
     fun formatTextBlocksToReceiptItems(groupedTextBlocks: Map<Int, List<TextBlock>>): List<ReceiptItem> {
-        val receiptItems = groupedTextBlocks.entries.sortedBy { it.key }
+        return groupedTextBlocks.entries.sortedBy { it.key }
             .mapNotNull { entry ->
                 val line = entry.value.joinToString(" ") { it.text }
-                val parts = line.split("\\s+".toRegex()).filter { it.isNotEmpty() }
-
-                if (parts.size >= 3) {
+                val parts = line.split("\\s+".toRegex()).takeLast(2) // Assuming the last two elements are price and quantity
+                if (parts.size == 2) {
                     try {
-                        val total = parts.last().filter { it.isDigit() || it == ',' || it == '.' }
-                            .replace(',', '.')
-                        val price = parts[parts.size - 2].filter { it.isDigit() || it == ',' || it == '.' }
-                            .replace(',', '.')
-                        val name = parts.dropLast(2).joinToString(" ")
-
-                        val priceValue = price.toDoubleOrNull()
-                        val totalValue = total.toDoubleOrNull()
-
-                        if (priceValue != null && totalValue != null) {
-                            val quantity = parts.getOrNull(parts.size - 3)?.toIntOrNull() ?: 1
-
-                            return@mapNotNull ReceiptItem(name, quantity, priceValue, totalValue)
-                        }
-                    } catch (e: Exception) {
+                        val quantity = parts[0].toInt()  // Parse quantity as an integer
+                        val price = parts[1].filter { it.isDigit() || it == ',' }.replace(',', '.').toDouble()
+                        val name = line.removeSuffix(parts.joinToString(" "))
+                        ReceiptItem(name, quantity, price, quantity * price)  // Total is calculated as quantity * price
+                    } catch (e: NumberFormatException) {
                         null
                     }
+                } else {
+                    null
                 }
-                return@mapNotNull null
             }
-
-        Log.d("Receipt Parsing", "Parsed Receipt Items: $receiptItems") // Log the result
-        return receiptItems
     }
-
 }

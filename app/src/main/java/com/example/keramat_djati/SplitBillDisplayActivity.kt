@@ -19,16 +19,14 @@ class SplitBillDisplayActivity : AppCompatActivity() {
         textViewRecognizedText = findViewById(R.id.textViewRecognizedText)
         recyclerViewItems = findViewById(R.id.recyclerViewItems)
 
-        // Set up RecyclerView
         recyclerViewItems.layoutManager = LinearLayoutManager(this)
         adapter = ReceiptAdapter(listOf())  // Initialize with empty list
         recyclerViewItems.adapter = adapter
 
-        // Get the recognized text and receipt items from the intent
         val recognizedText = intent.getStringExtra("recognizedText") ?: "No text recognized."
         textViewRecognizedText.text = recognizedText
 
-        val receiptItems: List<ReceiptItem> = intent.getParcelableArrayListExtra("receiptItems") ?: emptyList()
+        val receiptItems: ArrayList<ReceiptItem> = intent.getParcelableArrayListExtra("receiptItems") ?: arrayListOf()
 
         // Update the RecyclerView with the receipt items
         adapter.updateData(receiptItems)
