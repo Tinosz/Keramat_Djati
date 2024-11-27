@@ -59,6 +59,7 @@ dependencies {
 
     implementation(libs.vision.common)
     implementation(libs.play.services.mlkit.text.recognition.common)
+    implementation(libs.play.services.mlkit.text.recognition)
 
 
     testImplementation(libs.junit)

@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 class SplitBillActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
@@ -36,35 +37,26 @@ class SplitBillActivity : AppCompatActivity() {
         processButton = findViewById(R.id.button_process_image)
 
         captureButton.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
             } else {
                 openCamera()
             }
         }
 
         processButton.setOnClickListener {
-            capturedImageBitmap?.let {
-                processImage(it)
+            capturedImageBitmap?.let { bitmap ->
+                processImage(bitmap)
             }
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUEST_CAMERA_PERMISSION -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission was granted
-                    openCamera()
-                } else {
-                    // Permission denied
-                    Toast.makeText(this, "Camera permission is required to use camera", Toast.LENGTH_SHORT).show()
-                }
-            }
+        if (requestCode == REQUEST_CAMERA_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openCamera()
+        } else {
+            Toast.makeText(this, "Camera permission is required to use camera", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -76,18 +68,21 @@ class SplitBillActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            capturedImageBitmap = data?.extras?.get("data") as Bitmap
+            capturedImageBitmap = data?.extras?.get("data") as? Bitmap
             imageView.setImageBitmap(capturedImageBitmap)
         }
     }
 
     private fun processImage(image: Bitmap) {
-        val image = InputImage.fromBitmap(image, 0)
-        val recognizer = TextRecognition.getClient()
-        recognizer.process(image)
+        val inputImage = InputImage.fromBitmap(image, 0)
+        val options = TextRecognizerOptions.Builder().build()
+        val recognizer = TextRecognition.getClient(options)
+
+        recognizer.process(inputImage)
             .addOnSuccessListener { visionText ->
-                val intent = Intent(this, SplitBillDisplayActivity::class.java)
-                intent.putExtra("recognizedText", visionText.text)
+                val intent = Intent(this, SplitBillDisplayActivity::class.java).apply {
+                    putExtra("recognizedText", visionText.text)
+                }
                 startActivity(intent)
             }
             .addOnFailureListener { e ->
