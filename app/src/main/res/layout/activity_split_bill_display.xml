@@ -2,77 +2,95 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
+        android:id="@+id/textViewRecognizedText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Review Your Bill"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_gravity="center_horizontal"
+        android:text="Recognized Text"
+        android:textSize="18sp"
         android:padding="8dp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp"/>
-
-    <TextView
-        android:id="@+id/textViewSubTotal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sub-Total: -"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:padding="8dp"/>
-
-    <!-- Repeat similar TextViews for Tax, Service charge, Discount -->
-
-    <TextView
-        android:id="@+id/textViewTotal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Total Amount: Rp 00,0"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textStyle="bold"
-        android:padding="8dp"/>
-
-    <Button
-        android:id="@+id/buttonEdit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Edit Receipts"
-        android:backgroundTint="#4CAF50"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="16dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="16dp"
-        android:gravity="end">
-
-        <Button
-            android:id="@+id/buttonNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Next"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF"/>
-
-        <Button
-            android:id="@+id/buttonCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:backgroundTint="#F44336"
-            android:textColor="#FFFFFF"
-            android:layout_marginLeft="8dp"/>
-    </LinearLayout>
-
 </LinearLayout>
+
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:background="#FFFFFF"-->
+<!--    android:orientation="vertical"-->
+<!--    android:padding="16dp">-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textViewTitle"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Review Your Bill"-->
+<!--        android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:padding="8dp"/>-->
+
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/recycler_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:layout_marginTop="8dp"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textViewSubTotal"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Sub-Total: -"-->
+<!--        android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+<!--        android:padding="8dp"/>-->
+
+<!--    &lt;!&ndash; Repeat similar TextViews for Tax, Service charge, Discount &ndash;&gt;-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textViewTotal"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Total Amount: Rp 00,0"-->
+<!--        android:textAppearance="@style/TextAppearance.AppCompat.Title"-->
+<!--        android:textStyle="bold"-->
+<!--        android:padding="8dp"/>-->
+
+<!--    <Button-->
+<!--        android:id="@+id/buttonEdit"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Edit Receipts"-->
+<!--        android:backgroundTint="#4CAF50"-->
+<!--        android:textColor="#FFFFFF"-->
+<!--        android:layout_marginTop="16dp"/>-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:paddingTop="16dp"-->
+<!--        android:gravity="end">-->
+
+<!--        <Button-->
+<!--            android:id="@+id/buttonNext"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Next"-->
+<!--            android:backgroundTint="#4CAF50"-->
+<!--            android:textColor="#FFFFFF"/>-->
+
+<!--        <Button-->
+<!--            android:id="@+id/buttonCancel"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Cancel"-->
+<!--            android:backgroundTint="#F44336"-->
+<!--            android:textColor="#FFFFFF"-->
+<!--            android:layout_marginLeft="8dp"/>-->
+<!--    </LinearLayout>-->
+
+<!--</LinearLayout>-->

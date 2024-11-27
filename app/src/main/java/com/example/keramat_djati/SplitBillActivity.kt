@@ -10,8 +10,9 @@ import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
@@ -22,10 +23,10 @@ class SplitBillActivity : AppCompatActivity() {
     private lateinit var captureButton: Button
     private lateinit var processButton: Button
     private var capturedImageBitmap: Bitmap? = null
+    private lateinit var startCamera: ActivityResultLauncher<Intent>
 
     companion object {
         const val REQUEST_CAMERA_PERMISSION = 101
-        const val REQUEST_IMAGE_CAPTURE = 102
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,9 +37,11 @@ class SplitBillActivity : AppCompatActivity() {
         captureButton = findViewById(R.id.button_capture)
         processButton = findViewById(R.id.button_process_image)
 
+        setupActivityResultLauncher()
+
         captureButton.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
             } else {
                 openCamera()
             }
@@ -47,6 +50,15 @@ class SplitBillActivity : AppCompatActivity() {
         processButton.setOnClickListener {
             capturedImageBitmap?.let { bitmap ->
                 processImage(bitmap)
+            }
+        }
+    }
+
+    private fun setupActivityResultLauncher() {
+        startCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                capturedImageBitmap = result.data?.extras?.get("data") as? Bitmap
+                imageView.setImageBitmap(capturedImageBitmap)
             }
         }
     }
@@ -62,15 +74,7 @@ class SplitBillActivity : AppCompatActivity() {
 
     private fun openCamera() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            capturedImageBitmap = data?.extras?.get("data") as? Bitmap
-            imageView.setImageBitmap(capturedImageBitmap)
-        }
+        startCamera.launch(cameraIntent)
     }
 
     private fun processImage(image: Bitmap) {
@@ -80,13 +84,40 @@ class SplitBillActivity : AppCompatActivity() {
 
         recognizer.process(inputImage)
             .addOnSuccessListener { visionText ->
+                val blocks = convertVisionTextToTextBlocks(visionText)
+                val groupedTextBlocks = TextProcessingUtils.filterAndGroupTextBlocks(blocks)
+
+                // Create a formatted string from grouped text blocks to display
+                val formattedText = groupedTextBlocks.entries.joinToString("\n") { entry ->
+                    "Line ${entry.key}: ${entry.value.joinToString { it.text }}"
+                }
+
                 val intent = Intent(this, SplitBillDisplayActivity::class.java).apply {
-                    putExtra("recognizedText", visionText.text)
+                    putExtra("recognizedText", formattedText)
                 }
                 startActivity(intent)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error recognizing text: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun convertVisionTextToTextBlocks(visionText: com.google.mlkit.vision.text.Text): List<TextBlock> {
+        val textBlocks = mutableListOf<TextBlock>()
+        for (textBlock in visionText.textBlocks) {
+            val frame = textBlock.boundingBox
+            frame?.let {
+                textBlocks.add(
+                    TextBlock(
+                        text = textBlock.text,
+                        x = frame.left,
+                        y = frame.top,
+                        width = frame.width(),
+                        height = frame.height()
+                    )
+                )
+            }
+        }
+        return textBlocks
     }
 }
