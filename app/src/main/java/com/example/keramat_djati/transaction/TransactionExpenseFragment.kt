@@ -30,86 +30,104 @@ import java.util.Locale
  * create an instance of this fragment.
  */
 class TransactionExpenseFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
     private lateinit var viewModel: TransactionViewModel
     private val categories = mutableListOf<Category>()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[TransactionViewModel::class.java]
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_transaction_expense, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         loadExpenseCategories()
         setupUIBindings(view)
         setupDateInput()
 
+        // Prefill the form with ViewModel data (if available)
+        prefillFormWithViewModelData(view)
+
         view.findViewById<Button>(R.id.save_button).setOnClickListener {
             if (areRequiredFieldsFilled()) {
+                viewModel.setCurrentDateTime()
                 (activity as? TransactionActivityHost)?.saveTransactionToFirestore()
             } else {
                 Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
             }
         }
+
         view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
             navigateToMainActivity()
         }
     }
 
+    private fun prefillFormWithViewModelData(view: View) {
+        // Set the data from ViewModel to the UI elements
+        view.findViewById<EditText>(R.id.expense_title).setText(viewModel.title.value)
+        view.findViewById<EditText>(R.id.expense_note).setText(viewModel.note.value)
+        view.findViewById<EditText>(R.id.expense_date).setText(viewModel.date.value)
+        view.findViewById<EditText>(R.id.expense_amount).setText(viewModel.amount.value?.toString())
+
+        // Set the spinner to the correct category
+        val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_expense_categories)
+        val selectedCategory = viewModel.category.value
+        val position = (spinnerCategories.adapter as ArrayAdapter<String>).getPosition(selectedCategory)
+        spinnerCategories.setSelection(position)
+    }
+
     private fun navigateToMainActivity() {
         val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK) // Clear the back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-        requireActivity().finish() // Close the current activity to prevent the user from coming back to it
+        requireActivity().finish()
     }
 
     private fun areRequiredFieldsFilled(): Boolean {
         return viewModel.amount.value != null &&
-                viewModel.amount.value != 0L &&  // Assuming 0 is not a valid amount
+                viewModel.amount.value != 0L &&
                 viewModel.title.value != null &&
                 viewModel.category.value != null &&
                 viewModel.date.value != null
     }
 
-
     private fun setupUIBindings(view: View) {
-        view.findViewById<EditText>(R.id.expense_amount).apply {
-            afterTextChanged { viewModel.amount.value = it.toLongOrNull() ?: 0L }
-        }
-        view.findViewById<EditText>(R.id.expense_title).apply {
-            afterTextChanged { viewModel.title.value = it }
-        }
-        view.findViewById<EditText>(R.id.expense_date).apply {
-            afterTextChanged { viewModel.date.value = it }
-        }
-        view.findViewById<EditText>(R.id.expense_note).apply {
-            afterTextChanged { viewModel.note.value = it }
-        }
-        view.findViewById<Spinner>(R.id.spinner_expense_categories).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedCategory = categories[position]
-                viewModel.category.value = selectedCategory.name
-                viewModel.categoryId.value = selectedCategory.id
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+        // Bind EditText fields to the ViewModel
+        view.findViewById<EditText>(R.id.expense_amount).afterTextChanged {
+            viewModel.amount.value = it.toLongOrNull() ?: 0L
         }
 
+        view.findViewById<EditText>(R.id.expense_title).afterTextChanged {
+            viewModel.title.value = it
+        }
+
+        view.findViewById<EditText>(R.id.expense_date).afterTextChanged {
+            viewModel.date.value = it
+        }
+
+        view.findViewById<EditText>(R.id.expense_note).afterTextChanged {
+            viewModel.note.value = it
+        }
+
+        view.findViewById<Spinner>(R.id.spinner_expense_categories).onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    val selectedCategory = categories[position]
+                    viewModel.category.value = selectedCategory.name
+                    viewModel.categoryId.value = selectedCategory.id
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
     }
 
-    /**
-     * Helper function to simplify setting text watchers that update LiveData.
-     */
     fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -155,17 +173,13 @@ class TransactionExpenseFragment : Fragment() {
         }
     }
 
-
-
-
     private fun setupDateInput() {
         val dateEditText: EditText = view?.findViewById(R.id.expense_date) ?: return
         val calendar = Calendar.getInstance()
+
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, monthOfYear, dayOfMonth ->
-                // Note: monthOfYear is zero-based
-                // Use Locale.US to ensure consistent date format behavior
                 val dateString = String.format(Locale.US, "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth)
                 dateEditText.setText(dateString)
             },
@@ -178,5 +192,4 @@ class TransactionExpenseFragment : Fragment() {
             datePickerDialog.show()
         }
     }
-
 }

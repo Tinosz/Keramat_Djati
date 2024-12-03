@@ -1,0 +1,15 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/transactionHistoryFragment">
+
+    <fragment
+        android:id="@+id/transactionHistoryFragment"
+        android:name="com.example.keramat_djati.TransactionHistoryFragment"
+        android:label="Transaction History" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.keramat_djati.ProfileFragment"
+        android:label="Profile" />
+</navigation>
