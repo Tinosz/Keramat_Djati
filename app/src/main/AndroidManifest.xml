@@ -36,6 +36,21 @@
 
 <!--                    <category android:name="android.intent.category.LAUNCHER" />-->
 <!--                </intent-filter>-->
+
+            android:name=".addCategory"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".transaction.TransactionActivityHost"
+            android:exported="false" />
+        <activity
+            android:name=".TextResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateWalletActivity"
+            android:exported="false" />
         </activity>
         <activity
             android:name=".transaction.TransactionActivityHost"

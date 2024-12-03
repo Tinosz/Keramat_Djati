@@ -57,21 +57,36 @@ class TransactionIncomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         loadIncomeCategories()
-        setupUIBindings(view)
         setupDateInput()
+        setupUIBindings(view)
+
+        // Prefill the form with ViewModel data (if available)
+        view.findViewById<EditText>(R.id.income_title).setText(viewModel.title.value)
+        view.findViewById<EditText>(R.id.income_note).setText(viewModel.note.value)
+        view.findViewById<EditText>(R.id.income_date).setText(viewModel.date.value)
+        view.findViewById<EditText>(R.id.income_amount).setText(viewModel.amount.value?.toString())
+
+        val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_income_categories)
+        val category = viewModel.categoryType.value
+        val position = (spinnerCategories.adapter as ArrayAdapter<String>).getPosition(category)
+        spinnerCategories.setSelection(position)
 
         view.findViewById<Button>(R.id.save_button).setOnClickListener {
             if (areRequiredFieldsFilled()) {
+                viewModel.setCurrentDateTime()
                 (activity as? TransactionActivityHost)?.saveTransactionToFirestore()
             } else {
                 Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
             }
         }
+
         view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
             navigateToMainActivity()
         }
     }
+
 
     private fun navigateToMainActivity() {
         val intent = Intent(requireContext(), MainActivity::class.java)
@@ -170,8 +185,6 @@ class TransactionIncomeFragment : Fragment() {
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, monthOfYear, dayOfMonth ->
-                // Note: monthOfYear is zero-based
-                // Use Locale.US to ensure consistent date format behavior
                 val dateString = String.format(Locale.US, "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth)
                 dateEditText.setText(dateString)
             },
