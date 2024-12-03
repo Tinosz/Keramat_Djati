@@ -1,5 +1,8 @@
 package com.example.keramat_djati
 
+import android.annotation.SuppressLint
+import android.widget.Button
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +13,8 @@ import com.example.keramat_djati.R
 import com.example.keramat_djati.transaction.TransactionActivityHost
 
 class MainActivity : AppCompatActivity() {
+
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

@@ -25,4 +25,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation_menu" />
 
+    <Button
+        android:id="@+id/button_to_split_bill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to Split Bill"
+        android:layout_centerInParent="true"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

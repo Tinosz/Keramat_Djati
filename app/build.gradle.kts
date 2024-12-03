@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -40,32 +42,29 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+
 }
 
 dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.material)
-    // Java language implementation
-    implementation(libs.androidx.fragment)
-    // Kotlin
     implementation(libs.androidx.fragment.ktx)
-    // Compose
     implementation(libs.androidx.fragment.compose)
-
-    implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
-
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.firebase.auth)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.androidx.camera.view)
-    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.core.ktx)
+
+
+    implementation(libs.vision.common)
+    implementation(libs.play.services.mlkit.text.recognition.common)
+    implementation(libs.play.services.mlkit.text.recognition)
+
+
+
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
@@ -75,8 +74,17 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.androidx.cardview)
+
+
+    implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.firestore.ktx)
+    implementation (libs.firebase.functions)
+
+
     implementation (libs.androidx.camera.camera2)
     implementation (libs.androidx.camera.lifecycle)
-    implementation (libs.androidx.camera.view.v100alpha31)
-    implementation (libs.text.recognition)
+    implementation (libs.androidx.camera.view)
+
 }
