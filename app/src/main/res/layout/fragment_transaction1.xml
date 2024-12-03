@@ -59,7 +59,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/next_button"
+        android:id="@+id/next_but0ton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/next_button_text"

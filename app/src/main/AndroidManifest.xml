@@ -31,12 +31,9 @@
         <activity
             android:name=".SplitBillActivity"
             android:exported="true">
-<!--                <intent-filter>-->
-<!--                    <action android:name="android.intent.action.MAIN" />-->
+        </activity>
 
-<!--                    <category android:name="android.intent.category.LAUNCHER" />-->
-<!--                </intent-filter>-->
-
+        <activity
             android:name=".addCategory"
             android:exported="false" />
         <activity
@@ -45,16 +42,7 @@
         <activity
             android:name=".transaction.TransactionActivityHost"
             android:exported="false" />
-        <activity
-            android:name=".TextResultActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CreateWalletActivity"
-            android:exported="false" />
-        </activity>
-        <activity
-            android:name=".transaction.TransactionActivityHost"
-            android:exported="false" />
+
         <activity
             android:name=".CreateWalletActivity"
             android:exported="false" />
