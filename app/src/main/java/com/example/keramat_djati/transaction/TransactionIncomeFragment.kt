@@ -185,8 +185,6 @@ class TransactionIncomeFragment : Fragment() {
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, monthOfYear, dayOfMonth ->
-                // Note: monthOfYear is zero-based
-                // Use Locale.US to ensure consistent date format behavior
                 val dateString = String.format(Locale.US, "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth)
                 dateEditText.setText(dateString)
             },

@@ -12,7 +12,7 @@ import com.example.keramat_djati.transaction.TransactionActivityHost
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)  // Ensure this layout has the BottomNavigationView and NavHostFragment
+        setContentView(R.layout.activity_main)
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -25,9 +25,8 @@ class MainActivity : AppCompatActivity() {
                     NavigationUI.onNavDestinationSelected(item, navController)
                 }
                 R.id.addTransactionFragment -> {
-                    // Start an activity instead of navigating to a fragment
                     startActivity(Intent(this, TransactionActivityHost::class.java))
-                    true  // Return true to display the item as selected
+                    true
                 }
                 else -> false
             }

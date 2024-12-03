@@ -4,10 +4,14 @@
         android:id="@+id/transactionHistoryFragment"
         android:icon="@drawable/ic_wallet"
         android:title="Transactions" />
+    <item android:id="CategoryFragment"
+        android:title="Categories"/>
     <item
         android:id="@+id/addTransactionFragment"
         android:icon="@drawable/ic_add"
         android:title="Add" />
+    <item android:id="@+id/WalletFragment"
+        android:title="Wallets"/>
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"

@@ -8,6 +8,7 @@ import java.util.*
 class TransactionViewModel : ViewModel() {
     val walletName = MutableLiveData<String>()
     val walletId = MutableLiveData<String>()
+    val oldWalletId = MutableLiveData<String>()
     val categoryType = MutableLiveData<String>()
     val category = MutableLiveData<String>()
     val categoryId = MutableLiveData<String>()
@@ -16,7 +17,7 @@ class TransactionViewModel : ViewModel() {
     val date = MutableLiveData<String>()
     val time = MutableLiveData<String>()
     val note = MutableLiveData<String>()
-    val originalCategoryType = MutableLiveData<String>()  // Original type for comparison
+    val originalCategoryType = MutableLiveData<String>()
     val transactionId = MutableLiveData<String?>()
 
     fun setCurrentDateTime() {

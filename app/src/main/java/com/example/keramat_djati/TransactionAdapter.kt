@@ -43,7 +43,6 @@ class TransactionAdapter(
             categoryView.text = transaction.category
             dateView.text = "${transaction.date} ${transaction.time}"
 
-            // Determine color and prefix based on category
             val isIncome = transaction.category == "Income"
             val amountPrefix = if (isIncome) "+Rp " else "-Rp "
             val colorRes = if (isIncome) R.color.main_green else R.color.red
@@ -58,9 +57,9 @@ class TransactionAdapter(
         fun onItemClick(transaction: Transaction)
     }
 
-    fun updateData(newTransactions: List<Transaction>) {
+    fun updateTransactions(newTransactions: List<Transaction>) {
         transactions = newTransactions
-        notifyDataSetChanged()  // Notify the adapter to refresh the views
+        notifyDataSetChanged()
     }
 }
 

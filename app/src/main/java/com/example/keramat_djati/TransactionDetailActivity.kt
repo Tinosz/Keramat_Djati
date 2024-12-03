@@ -53,11 +53,9 @@ class TransactionDetailActivity : AppCompatActivity() {
         findViewById<Button>(R.id.edit_button).setOnClickListener {
             val intent = Intent(this, TransactionActivityHost::class.java)
 
-            // Get the transaction ID and wallet ID from the current activity's intent
             val transactionId = this.intent.getStringExtra("transaction_id")
             val walletId = this.intent.getStringExtra("wallet_id")
 
-            // Put the data into the new intent
             intent.putExtra("transaction_id", transactionId)
             intent.putExtra("wallet_id", walletId)
             intent.putExtra("title", titleTextView.text.toString())
@@ -67,7 +65,6 @@ class TransactionDetailActivity : AppCompatActivity() {
             intent.putExtra("note", noteTextView.text.toString())
             intent.putExtra("transaction_type", transactionTypeTextView.text.toString())
 
-            // Start the new activity
             startActivity(intent)
         }
         findViewById<Button>(R.id.delete_transaction_button).setOnClickListener {

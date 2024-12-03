@@ -28,7 +28,7 @@ class TransactionActivityHost : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[TransactionViewModel::class.java]
 
         val transactionId = intent.getStringExtra("transaction_id")
-        viewModel.transactionId.value = transactionId // Store transactionId in ViewModel
+        viewModel.transactionId.value = transactionId
 
         val walletId = intent.getStringExtra("wallet_id")
         val title = intent.getStringExtra("title")
@@ -68,7 +68,7 @@ class TransactionActivityHost : AppCompatActivity() {
     fun saveTransactionToFirestore() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         val walletId = viewModel.walletId.value
-        val transactionId = viewModel.transactionId.value // Check if transactionId exists
+        val transactionId = viewModel.transactionId.value
 
         if (userId == null || walletId.isNullOrEmpty()) {
             Toast.makeText(this, "User or wallet not selected", Toast.LENGTH_LONG).show()
@@ -77,6 +77,7 @@ class TransactionActivityHost : AppCompatActivity() {
 
         val db = FirebaseFirestore.getInstance()
 
+        // Determine the collection path based on category type
         val collectionPath = when (viewModel.categoryType.value) {
             "Expense" -> "expenses"
             "Income" -> "incomes"
@@ -86,11 +87,12 @@ class TransactionActivityHost : AppCompatActivity() {
             }
         }
 
-        // Define the reference to the collection path (without transactionId for now)
+        // Reference to the current transaction collection
         val transactionCollectionRef = db.collection("accounts").document(userId)
             .collection("wallets").document(walletId)
             .collection(collectionPath)
 
+        // Transaction data to be saved
         val transactionData: MutableMap<String, Any> = hashMapOf(
             "amount" to (viewModel.amount.value ?: 0L),
             "title" to (viewModel.title.value ?: ""),
@@ -98,79 +100,148 @@ class TransactionActivityHost : AppCompatActivity() {
             "date" to (viewModel.date.value ?: ""),
             "note" to (viewModel.note.value ?: ""),
             "time" to (viewModel.time.value ?: System.currentTimeMillis().toString())
-        ) as MutableMap<String, Any>
-
+        )
 
         if (transactionId != null && transactionId.isNotEmpty()) {
-            // UPDATE EXISTING TRANSACTION
-            val transactionDocRef = transactionCollectionRef.document(transactionId) // Use transactionId in path
+            // If transaction ID exists, try to update the existing transaction
+            val transactionDocRef = transactionCollectionRef.document(transactionId)
 
             transactionDocRef.get(Source.SERVER).addOnSuccessListener { document ->
                 if (document.exists()) {
                     val oldAmount = document.getLong("amount") ?: 0L
                     val newAmount = viewModel.amount.value ?: 0L
 
-                    transactionDocRef.update(transactionData)  // Use update instead of set()
+                    // Update existing transaction if it exists
+                    transactionDocRef.update(transactionData)
                         .addOnSuccessListener {
                             Log.d("TransactionActivityHost", "Transaction updated successfully.")
-                            updateWalletBalance(userId, walletId, oldAmount, newAmount, viewModel.categoryType.value ?: "Expense")
+                            updateWalletBalance(userId, walletId, viewModel.oldWalletId.value ?: "", oldAmount, newAmount, viewModel.categoryType.value ?: "Expense")
                             navigateToMainActivity()
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("TransactionActivityHost", "Failed to update transaction", e)
-                            Toast.makeText(this, "Failed to update transaction: ${e.message}", Toast.LENGTH_LONG).show()
+                        .addOnFailureListener {
+                            Log.e("TransactionActivityHost", "Failed to update transaction.", it)
+                            Toast.makeText(this, "Failed to update transaction", Toast.LENGTH_SHORT).show()
                         }
-
                 } else {
-                    Log.e("TransactionActivityHost", "Transaction not found: $transactionId")
-                    Toast.makeText(this, "Transaction not found", Toast.LENGTH_SHORT).show()
+                    // If transaction doesn't exist, move the transaction to the new wallet
+
+                    // 1. Move data to the new wallet
+                    val oldAmount = document.getLong("amount") ?: 0L
+
+                    transactionCollectionRef.add(transactionData)
+                        .addOnSuccessListener {
+                            Log.d("TransactionActivityHost", "Transaction moved successfully to new wallet.")
+
+                            // 2. Delete the old transaction from the original wallet
+                            val oldTransactionDocRef = db.collection("accounts").document(userId)
+                                .collection("wallets").document(viewModel.oldWalletId.value ?: "")
+                                .collection(collectionPath).document(transactionId)
+
+                            Log.d("TransactionActivityHost", "Old wallet ID: ${viewModel.oldWalletId.value}")
+
+                            oldTransactionDocRef.delete()
+                                .addOnSuccessListener {
+                                    updateWalletBalance(userId, walletId,  viewModel.oldWalletId.value ?: "", oldAmount, viewModel.amount.value ?: 0L, viewModel.categoryType.value ?: "Expense")
+                                    navigateToMainActivity()
+                                }
+                                .addOnFailureListener {
+                                    Log.e("TransactionActivityHost", "Failed to delete old transaction.", it)
+                                    Toast.makeText(this, "Failed to delete old transaction", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        .addOnFailureListener {
+                            Log.e("TransactionActivityHost", "Failed to move transaction.", it)
+                            Toast.makeText(this, "Failed to move transaction", Toast.LENGTH_SHORT).show()
+                        }
                 }
             }
         } else {
+            // If no transaction ID exists, create a new transaction
             transactionCollectionRef.add(transactionData)
-                .addOnSuccessListener { documentReference ->
-                    Log.d("TransactionActivityHost", "New transaction added with ID: ${documentReference.id}")
-                    updateWalletBalance(userId, walletId, 0L, viewModel.amount.value ?: 0L, viewModel.categoryType.value ?: "Expense")
+                .addOnSuccessListener {
+                    updateWalletBalance(userId, walletId, viewModel.oldWalletId.value ?: "", 0L, viewModel.amount.value ?: 0L, viewModel.categoryType.value ?: "Expense")
+                    Log.d("TransactionActivityHost", "New transaction created successfully.")
                     navigateToMainActivity()
                 }
-                .addOnFailureListener { e ->
-                    Log.e("TransactionActivityHost", "Failed to add new transaction", e)
-                    Toast.makeText(this, "Failed to add new transaction: ${e.message}", Toast.LENGTH_LONG).show()
+                .addOnFailureListener {
+                    Log.e("TransactionActivityHost", "Failed to create new transaction.", it)
+                    Toast.makeText(this, "Failed to create transaction", Toast.LENGTH_SHORT).show()
                 }
         }
     }
 
 
+
     private fun updateWalletBalance(
         userId: String,
         walletId: String,
+        oldWalletId: String,
         oldAmount: Long,
         newAmount: Long,
         type: String
     ) {
+        if (walletId.isEmpty()) {
+            Toast.makeText(this, "User or wallet not selected", Toast.LENGTH_LONG).show()
+            return
+        }
+
         val db = FirebaseFirestore.getInstance()
-        val walletRef = db.collection("accounts").document(userId).collection("wallets").document(walletId)
+
+        // Reference to wallet collections for both old and new wallets
+        val oldWalletRef = db.collection("accounts").document(userId)
+            .collection("wallets").document(oldWalletId ?: "")
+        val newWalletRef = db.collection("accounts").document(userId)
+            .collection("wallets").document(walletId ?: "")
 
         db.runTransaction { transaction ->
-            val snapshot = transaction.get(walletRef)
-            val currentBalance = snapshot.getLong("amount") ?: 0L
+            // Get current balances for both old and new wallets
+            val oldWalletSnapshot = transaction.get(oldWalletRef)
+            val newWalletSnapshot = transaction.get(newWalletRef)
+
+            val oldBalance = oldWalletSnapshot.getLong("amount") ?: 0L
+            val newBalance = newWalletSnapshot.getLong("amount") ?: 0L
 
             // Calculate the balance change
             val balanceChange = newAmount - oldAmount
 
-            // Update the balance based on transaction type (expense or income)
-            val newBalance = if (type == "Expense") {
-                currentBalance - balanceChange // Expense: Subtract net change
+            // Handle balance update for old wallet
+            if (walletId != oldWalletId) {
+                // Update the old wallet balance
+                val newOldBalance = if (type == "Expense") {
+                    oldBalance - balanceChange
+                } else {
+                    oldBalance + balanceChange
+                }
+
+                if (newOldBalance < 0) {
+                    throw IllegalStateException("Insufficient funds in the old wallet.")
+                }
+
+                // Update old wallet balance
+                transaction.update(oldWalletRef, "amount", newOldBalance)
+
+                // Update the new wallet balance
+                val newNewBalance = if (type == "Expense") {
+                    newBalance - balanceChange
+                } else {
+                    newBalance + balanceChange
+                }
+
+                transaction.update(newWalletRef, "amount", newNewBalance)
             } else {
-                currentBalance + balanceChange // Income: Add net change
-            }
+                // If walletId has not changed, just update the current wallet balance
+                val newWalletAmount = if (type == "Expense") {
+                    newBalance - balanceChange
+                } else {
+                    newBalance + balanceChange
+                }
 
-            if (newBalance < 0) {
-                throw IllegalStateException("Insufficient funds for this transaction.")
-            }
+                if (newWalletAmount < 0) {
+                    throw IllegalStateException("Insufficient funds in the wallet.")
+                }
 
-            // Commit the new balance
-            transaction.update(walletRef, "amount", newBalance)
+                transaction.update(newWalletRef, "amount", newWalletAmount)
+            }
         }.addOnSuccessListener {
             Log.d("TransactionActivityHost", "Wallet balance updated successfully.")
         }.addOnFailureListener { e ->
@@ -178,9 +249,6 @@ class TransactionActivityHost : AppCompatActivity() {
             Toast.makeText(this, "Error updating wallet balance: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
-
-
-
 
 
 
