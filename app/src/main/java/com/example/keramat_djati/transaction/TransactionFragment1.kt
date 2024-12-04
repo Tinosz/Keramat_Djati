@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.keramat_djati.MainActivity
 import com.example.keramat_djati.R
+import com.example.keramat_djati.SplitBillActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -55,6 +56,14 @@ class TransactionFragment1 : Fragment() {
         val position = (spinnerCategories.adapter as ArrayAdapter<String>).getPosition(category)
         spinnerCategories.setSelection(position)
 
+        view.findViewById<Button>(R.id.camera_button).setOnClickListener{
+            navigateToCamera()
+        }
+
+        view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
+            navigateToMainActivity()
+        }
+
         view.findViewById<Button>(R.id.next_button).setOnClickListener {
             val selectedCategory = viewModel.categoryType.value
             when (selectedCategory) {
@@ -63,10 +72,13 @@ class TransactionFragment1 : Fragment() {
                 else -> Toast.makeText(context, "Invalid category selected", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
-        view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
-            navigateToMainActivity()
-        }
+    private fun navigateToCamera(){
+        val intent = Intent(requireContext(), SplitBillActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        requireActivity().finish()
     }
 
 
