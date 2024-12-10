@@ -21,15 +21,12 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/light_green1"
+        android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:itemActiveIndicatorStyle="@style/Theme.BottomNavigationView.ActiveIndicator"
+        app:itemIconTint="@color/bottom_nav_item_color"
         app:menu="@menu/bottom_navigation_menu" />
-
-    <Button
-        android:id="@+id/button_to_split_bill"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to Split Bill"
-        android:layout_centerInParent="true"/>
+    
 
 </androidx.constraintlayout.widget.ConstraintLayout>

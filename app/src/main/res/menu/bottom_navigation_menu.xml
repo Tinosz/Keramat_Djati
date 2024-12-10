@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
     <item
         android:id="@+id/transactionHistoryFragment"
         android:icon="@drawable/ic_wallet"
+        app:itemIconTint="@color/light_green2"
         android:title="Transactions" />
     <item
         android:id="@+id/addTransactionFragment"
         android:icon="@drawable/ic_add"
+        app:itemIconTint="@color/light_green2"
         android:title="Add" />
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"
+        app:itemIconTint="@color/light_green2"
         android:title="Profile" />
 </menu>

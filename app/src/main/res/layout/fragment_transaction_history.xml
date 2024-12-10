@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TransactionHistoryFragment"
-    android:padding="16dp">
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp">
+
 
     <ImageButton
         android:id="@+id/button_add_wallet"
@@ -23,20 +26,30 @@
         android:id="@+id/recyclerView_wallets"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="horizontal"
+        android:scrollbars="none"
         tools:listitem="@layout/wallet_recycler"
         android:layout_marginBottom="8dp"
         android:orientation="horizontal"
         android:layout_below="@id/button_add_wallet"
     android:layout_marginTop="16dp" />
 
+    <TextView
+        android:id="@+id/text_date_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/recyclerView_wallets"
+        android:layout_marginTop="16dp"
+        android:text="Today"
+
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_transactions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical"
+        android:scrollbars="none"
         tools:listitem="@layout/transaction_item_recycler"
-        android:layout_below="@id/recyclerView_wallets"
+        android:layout_below="@id/text_date_header"
     android:layout_marginTop="16dp" />
 
 </RelativeLayout>

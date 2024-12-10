@@ -20,6 +20,7 @@ import com.example.keramat_djati.transaction.TransactionViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 
 class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickListener {
@@ -30,6 +31,9 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
     private lateinit var walletAdapter: WalletAdapter
     private lateinit var walletRecyclerView: RecyclerView
     private lateinit var snapHelper: PagerSnapHelper
+
+    private var incomeListener: ListenerRegistration? = null
+    private var expenseListener: ListenerRegistration? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -132,6 +136,14 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
     }
 
 
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Remove Firestore listeners when the fragment is destroyed
+        incomeListener?.remove()
+        expenseListener?.remove()
+    }
+
     private fun fetchTransactions(walletId: String) {
         val db = FirebaseFirestore.getInstance()
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -140,12 +152,9 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
         val expensesRef = accountRef.collection("expenses").orderBy("date", Query.Direction.DESCENDING)
         val incomesRef = accountRef.collection("incomes").orderBy("date", Query.Direction.DESCENDING)
 
-
-        expensesRef.addSnapshotListener { expensesSnapshot, expensesError ->
-            incomesRef.addSnapshotListener { incomesSnapshot, incomesError ->
+        expenseListener = expensesRef.addSnapshotListener { expensesSnapshot, expensesError ->
+            incomeListener = incomesRef.addSnapshotListener { incomesSnapshot, incomesError ->
                 if (expensesError != null || incomesError != null) {
-                    Toast.makeText(context, "Error fetching transactions", Toast.LENGTH_SHORT)
-                        .show()
                     return@addSnapshotListener
                 }
 
@@ -168,6 +177,7 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
             }
         }
     }
+
 
     override fun onItemClick(transaction: Transaction) {
 
