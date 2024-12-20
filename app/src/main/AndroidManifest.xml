@@ -8,12 +8,11 @@
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" android:targetSdkVersion="33" />
-
-
-
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        android:targetSdkVersion="33" />
 
     <application
         android:allowBackup="true"
@@ -26,13 +25,14 @@
         android:theme="@style/Theme.KERAMAT_DJATI"
         tools:targetApi="31">
         <activity
-            android:name=".SplitBillDisplayActivity"
+            android:name=".savebill.SaveBillActivity"
             android:exported="false" />
         <activity
-            android:name=".SplitBillActivity"
-            android:exported="true">
-        </activity>
-
+            android:name=".splitbill.SplitBillDisplayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".splitbill.SplitBillActivity"
+            android:exported="true"></activity>
         <activity
             android:name=".addCategory"
             android:exported="false" />
@@ -42,7 +42,6 @@
         <activity
             android:name=".transaction.TransactionActivityHost"
             android:exported="false" />
-
         <activity
             android:name=".CreateWalletActivity"
             android:exported="false" />

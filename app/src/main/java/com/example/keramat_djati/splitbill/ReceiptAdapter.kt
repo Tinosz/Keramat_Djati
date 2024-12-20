@@ -1,10 +1,11 @@
-package com.example.keramat_djati
+package com.example.keramat_djati.splitbill
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.keramat_djati.R
 
 class ReceiptAdapter(private var items: List<ReceiptItem>) : RecyclerView.Adapter<ReceiptAdapter.ViewHolder>() {
 
