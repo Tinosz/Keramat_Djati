@@ -14,7 +14,7 @@ class ReceiptAdapter(private val receipts: List<Receipt>) : RecyclerView.Adapter
     class ReceiptViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleTextView: TextView = view.findViewById(R.id.titleTextView)
         val dateTextView: TextView = view.findViewById(R.id.dateTextView)
-        val descriptionTextView: TextView = view.findViewById(R.id.descriptionTextView)
+        //val descriptionTextView: TextView = view.findViewById(R.id.descriptionTextView) // Remove or comment out if not used
         val imageView: ImageView = view.findViewById(R.id.imageView)
     }
 
@@ -27,7 +27,7 @@ class ReceiptAdapter(private val receipts: List<Receipt>) : RecyclerView.Adapter
         val receipt = receipts[position]
         holder.titleTextView.text = receipt.title
         holder.dateTextView.text = receipt.date
-        holder.descriptionTextView.text = receipt.description
+        //holder.descriptionTextView.text = receipt.description // Remove or comment out if not used
 
         // Use Glide to load the image directly
         if (receipt.imageUrl.isNotEmpty()) {
@@ -43,6 +43,3 @@ class ReceiptAdapter(private val receipts: List<Receipt>) : RecyclerView.Adapter
 
     override fun getItemCount(): Int = receipts.size
 }
-
-
-
