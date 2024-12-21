@@ -67,20 +67,20 @@ class AddReceiptActivity : AppCompatActivity() {
     }
 
     private fun checkPermissionAndPickImage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // For Android 10 (API level 29) and above, the permission might not be necessary for picking images.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            // Check and request permission if needed for versions below Android 10
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
             } else {
                 pickImage()
             }
         } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
-            } else {
-                pickImage()
-            }
+            // Directly pick the image as READ_EXTERNAL_STORAGE is not required for ACTION_PICK on API 29 and above
+            pickImage()
         }
     }
+
 
     private fun pickImage() {
         val intent = Intent(Intent.ACTION_PICK)
@@ -145,11 +145,13 @@ class AddReceiptActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 pickImage()
             } else {
-                Toast.makeText(this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show()
+                // Inform the user that permission is denied and the action cannot be performed
+                Toast.makeText(this, "Permission denied to read your External storage, cannot pick images", Toast.LENGTH_LONG).show()
             }
         }
     }
+
 }
