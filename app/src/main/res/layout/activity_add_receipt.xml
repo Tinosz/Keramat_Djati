@@ -16,8 +16,12 @@
         android:id="@+id/editTextDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date"
-        android:inputType="date" />
+        android:hint="Select Date"
+        android:focusable="false"
+        android:clickable="true"
+        android:cursorVisible="false"
+        android:inputType="none" />
+
 
     <ImageView
         android:id="@+id/imageView"

@@ -45,7 +45,15 @@ class SaveReceiptActivity : AppCompatActivity() {
                 val receipts = documents.map { document ->
                     document.toObject(Receipt::class.java)
                 }
-                adapter = ReceiptAdapter(receipts)
+                adapter = ReceiptAdapter(receipts) { receipt ->
+                    Intent(this, ReceiptDetailActivity::class.java).also {
+                        it.putExtra("title", receipt.title)
+                        it.putExtra("date", receipt.date)
+                        it.putExtra("imageUrl", receipt.imageUrl)
+                        it.putExtra("description", receipt.description)
+                        startActivity(it)
+                    }
+                }
                 receiptsRecyclerView.adapter = adapter
             }
             .addOnFailureListener { exception ->

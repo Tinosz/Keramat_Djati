@@ -7,15 +7,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.firebase.storage.FirebaseStorage
 
-class ReceiptAdapter(private val receipts: List<Receipt>) : RecyclerView.Adapter<ReceiptAdapter.ReceiptViewHolder>() {
+class ReceiptAdapter(private val receipts: List<Receipt>, private val onClick: (Receipt) -> Unit) : RecyclerView.Adapter<ReceiptAdapter.ReceiptViewHolder>() {
 
     class ReceiptViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleTextView: TextView = view.findViewById(R.id.titleTextView)
         val dateTextView: TextView = view.findViewById(R.id.dateTextView)
-        //val descriptionTextView: TextView = view.findViewById(R.id.descriptionTextView) // Remove or comment out if not used
         val imageView: ImageView = view.findViewById(R.id.imageView)
+        fun bind(receipt: Receipt, onClick: (Receipt) -> Unit) {
+            itemView.setOnClickListener { onClick(receipt) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptViewHolder {
@@ -27,18 +28,12 @@ class ReceiptAdapter(private val receipts: List<Receipt>) : RecyclerView.Adapter
         val receipt = receipts[position]
         holder.titleTextView.text = receipt.title
         holder.dateTextView.text = receipt.date
-        //holder.descriptionTextView.text = receipt.description // Remove or comment out if not used
-
-        // Use Glide to load the image directly
-        if (receipt.imageUrl.isNotEmpty()) {
-            Glide.with(holder.imageView.context)
-                .load(receipt.imageUrl)
-                .placeholder(R.drawable.baseline_android_24)
-                .error(R.drawable.baseline_error_24)
-                .into(holder.imageView)
-        } else {
-            holder.imageView.setImageResource(R.drawable.baseline_android_24)
-        }
+        Glide.with(holder.imageView.context)
+            .load(receipt.imageUrl)
+            .placeholder(R.drawable.baseline_android_24)
+            .error(R.drawable.baseline_error_24)
+            .into(holder.imageView)
+        holder.bind(receipt, onClick)
     }
 
     override fun getItemCount(): Int = receipts.size

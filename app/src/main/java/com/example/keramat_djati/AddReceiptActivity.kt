@@ -2,10 +2,12 @@ package com.example.keramat_djati
 
 import android.Manifest
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -15,9 +17,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.util.*
 
 class AddReceiptActivity : AppCompatActivity() {
 
@@ -53,16 +57,28 @@ class AddReceiptActivity : AppCompatActivity() {
             if (imageUri != null) {
                 uploadImageAndSaveReceipt()
             } else {
-                saveReceipt() // This will call the version of saveReceipt with an empty string as the default parameter
+                saveReceipt() // Save without an image URL
             }
+        }
+
+        editTextDate.setOnClickListener {
+            showDatePicker()
         }
     }
 
     private fun checkPermissionAndPickImage() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+            } else {
+                pickImage()
+            }
         } else {
-            pickImage()
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+            } else {
+                pickImage()
+            }
         }
     }
 
@@ -76,35 +92,22 @@ class AddReceiptActivity : AppCompatActivity() {
         imageUri?.let { uri ->
             val fileName = "images/${FirebaseAuth.getInstance().currentUser?.uid}/${System.currentTimeMillis()}"
             val fileRef = storageReference.child(fileName)
-
             fileRef.putFile(uri).addOnSuccessListener {
-                // Image upload was successful, now get the download URL
                 fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    // Here you get the actual URL to access the image
                     val imageUrl = downloadUri.toString()
                     Log.d("UploadSuccess", "Image uploaded successfully to Firebase Storage: $imageUrl")
                     Toast.makeText(this, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
-
-                    // Save receipt with the actual image URL instead of the path
                     saveReceipt(imageUrl)
                 }.addOnFailureListener { exception ->
-                    // Handle failure to get the download URL
-                    Log.e("UploadError", "Failed to get download URL: ${exception.message}")
                     Toast.makeText(this, "Failed to get download URL: ${exception.message}", Toast.LENGTH_LONG).show()
                 }
             }.addOnFailureListener { exception ->
-                // Handle failure to upload the image
-                Log.e("UploadError", "Failed to upload image: ${exception.message}")
                 Toast.makeText(this, "Failed to upload image: ${exception.message}", Toast.LENGTH_LONG).show()
             }
-        } ?: run {
-            // Handle case where there is no image URI available
-            Toast.makeText(this, "No image selected to upload.", Toast.LENGTH_SHORT).show()
-        }
+        } ?: Toast.makeText(this, "No image selected to upload.", Toast.LENGTH_SHORT).show()
     }
 
-
-    private fun saveReceipt(imagePath: String = "") {
+    private fun saveReceipt(imageUrl: String = "") {
         val title = editTextTitle.text.toString()
         val date = editTextDate.text.toString()
         val description = editTextDescription.text.toString()
@@ -114,7 +117,7 @@ class AddReceiptActivity : AppCompatActivity() {
             "title" to title,
             "date" to date,
             "description" to description,
-            "imageUrl" to imagePath
+            "imageUrl" to imageUrl
         )
 
         userId?.let {
@@ -122,11 +125,17 @@ class AddReceiptActivity : AppCompatActivity() {
                 .collection("savedreceipt").add(receipt)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Receipt saved successfully", Toast.LENGTH_LONG).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Failed to save receipt: ${it.message}", Toast.LENGTH_LONG).show()
+                }.addOnFailureListener { exception ->
+                    Toast.makeText(this, "Failed to save receipt: ${exception.message}", Toast.LENGTH_LONG).show()
                 }
         }
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(this, DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+            editTextDate.setText(String.format(Locale.getDefault(), "%d-%02d-%02d", year, month + 1, dayOfMonth))
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
     }
 
     companion object {
