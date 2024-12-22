@@ -1,39 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/imageViewDetail"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <EditText
-        android:id="@+id/editTextTitleDetail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Title"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/editTextDateDetail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Date"/>
+            <ImageView
+                android:id="@+id/imageViewDetail"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true" />
 
-    <EditText
-        android:id="@+id/editTextDescriptionDetail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Description"
-        android:inputType="textMultiLine"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:paddingTop="8dp">
 
-    <Button
-        android:id="@+id/buttonSaveChanges"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save Changes"/>
-</LinearLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextTitleDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Title" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:clickable="true"
+                android:focusable="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextDateDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Select Date"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:drawableEnd="@drawable/ic_calendar" /> <!-- Ensure you have a calendar icon drawable -->
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:paddingTop="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextDescriptionDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Description"
+                    android:inputType="textMultiLine" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSaveChanges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save Changes"
+                android:layout_marginTop="16dp"
+                app:cornerRadius="4dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+            <ProgressBar
+                android:id="@+id/progressBarDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonDownloadPdf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Download as PDF"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:cornerRadius="4dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
