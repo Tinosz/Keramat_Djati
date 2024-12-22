@@ -43,15 +43,22 @@ class SaveReceiptActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { documents ->
                 val receipts = documents.map { document ->
-                    document.toObject(Receipt::class.java)
+                    Receipt(
+                        title = document.getString("title") ?: "",
+                        date = document.getString("date") ?: "",
+                        description = document.getString("description") ?: "",
+                        imageUrl = document.getString("imageUrl") ?: "",
+                        documentId = document.id  // Storing the Firestore document ID here
+                    )
                 }
                 adapter = ReceiptAdapter(receipts) { receipt ->
-                    Intent(this, ReceiptDetailActivity::class.java).also {
-                        it.putExtra("title", receipt.title)
-                        it.putExtra("date", receipt.date)
-                        it.putExtra("imageUrl", receipt.imageUrl)
-                        it.putExtra("description", receipt.description)
-                        startActivity(it)
+                    Intent(this, ReceiptDetailActivity::class.java).also { intent ->
+                        intent.putExtra("title", receipt.title)
+                        intent.putExtra("date", receipt.date)
+                        intent.putExtra("imageUrl", receipt.imageUrl)
+                        intent.putExtra("description", receipt.description)
+                        intent.putExtra("documentId", receipt.documentId)
+                        startActivity(intent)
                     }
                 }
                 receiptsRecyclerView.adapter = adapter
