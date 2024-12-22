@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -14,6 +16,7 @@ class SaveReceiptActivity : AppCompatActivity() {
 
     private lateinit var receiptsRecyclerView: RecyclerView
     private lateinit var adapter: ReceiptAdapter
+
     private val firestoreReference = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,13 +25,20 @@ class SaveReceiptActivity : AppCompatActivity() {
 
         receiptsRecyclerView = findViewById(R.id.receiptsRecyclerView)
         receiptsRecyclerView.layoutManager = LinearLayoutManager(this)
+        receiptsRecyclerView.itemAnimator = DefaultItemAnimator()
         fetchReceipts()
 
-        val btnAddReceipt = findViewById<Button>(R.id.btnAddReceipt)
-        btnAddReceipt.setOnClickListener {
+        val fabAddReceipt = findViewById<FloatingActionButton>(R.id.fabAddReceipt)
+        fabAddReceipt.setOnClickListener {
             val intent = Intent(this, AddReceiptActivity::class.java)
             startActivity(intent)
         }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchReceipts()  // Ensure data is refreshed every time the activity resumes
     }
 
     private fun fetchReceipts() {
