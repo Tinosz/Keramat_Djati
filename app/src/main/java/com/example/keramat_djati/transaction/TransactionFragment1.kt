@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.keramat_djati.MainActivity
 import com.example.keramat_djati.R
-import com.example.keramat_djati.SplitBillActivity
+import com.example.keramat_djati.SaveReceiptActivity
+import com.example.keramat_djati.splitbill.SplitBillActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -75,7 +75,7 @@ class TransactionFragment1 : Fragment() {
     }
 
     private fun navigateToCamera(){
-        val intent = Intent(requireContext(), SplitBillActivity::class.java)
+        val intent = Intent(requireContext(), SaveReceiptActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         requireActivity().finish()

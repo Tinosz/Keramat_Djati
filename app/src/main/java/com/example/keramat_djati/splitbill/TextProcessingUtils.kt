@@ -1,4 +1,4 @@
-package com.example.keramat_djati
+package com.example.keramat_djati.splitbill
 
 object TextProcessingUtils {
 

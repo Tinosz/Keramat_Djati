@@ -3,31 +3,38 @@ package com.example.keramat_djati
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
-class ReceiptAdapter(private var items: List<ReceiptItem>) : RecyclerView.Adapter<ReceiptAdapter.ViewHolder>() {
+class ReceiptAdapter(private val receipts: List<Receipt>, private val onClick: (Receipt) -> Unit) : RecyclerView.Adapter<ReceiptAdapter.ReceiptViewHolder>() {
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itemName: TextView = itemView.findViewById(R.id.textViewItemName)
-        val price: TextView = itemView.findViewById(R.id.textViewTotal)  // Display the total price
+    class ReceiptViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val titleTextView: TextView = view.findViewById(R.id.titleTextView)
+        val dateTextView: TextView = view.findViewById(R.id.dateTextView)
+        val imageView: ImageView = view.findViewById(R.id.imageView)
+        fun bind(receipt: Receipt, onClick: (Receipt) -> Unit) {
+            itemView.setOnClickListener { onClick(receipt) }
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.recycler_item_receipt, parent, false)
-        return ViewHolder(itemView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.receipt_item, parent, false)
+        return ReceiptViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
-        holder.itemName.text = item.itemName  // Set item name
-        holder.price.text = item.total.toString()  // Set total price
+    override fun onBindViewHolder(holder: ReceiptViewHolder, position: Int) {
+        val receipt = receipts[position]
+        holder.titleTextView.text = receipt.title
+        holder.dateTextView.text = receipt.date
+        Glide.with(holder.imageView.context)
+            .load(receipt.imageUrl)
+            .placeholder(R.drawable.baseline_android_24)
+            .error(R.drawable.baseline_error_24)
+            .into(holder.imageView)
+        holder.bind(receipt, onClick)
     }
 
-    override fun getItemCount(): Int = items.size
-
-    fun updateData(newItems: List<ReceiptItem>) {
-        items = newItems
-        notifyDataSetChanged()
-    }
+    override fun getItemCount(): Int = receipts.size
 }
