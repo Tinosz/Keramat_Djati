@@ -56,9 +56,6 @@ class TransactionFragment1 : Fragment() {
         val position = (spinnerCategories.adapter as ArrayAdapter<String>).getPosition(category)
         spinnerCategories.setSelection(position)
 
-        view.findViewById<Button>(R.id.camera_button).setOnClickListener{
-            navigateToCamera()
-        }
 
         view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
             navigateToMainActivity()

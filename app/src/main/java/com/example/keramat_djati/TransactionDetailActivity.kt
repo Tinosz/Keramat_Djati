@@ -59,17 +59,25 @@ class TransactionDetailActivity : AppCompatActivity() {
             val transactionId = this.intent.getStringExtra("transaction_id")
             val walletId = this.intent.getStringExtra("wallet_id")
 
+            // Properly clean and parse the amount
+            val rawAmount = amountTextView.text.toString()
+                .replace("Rp. ", "")  // Remove the Rp.
+                .replace(".", "")     // Remove thousand separator
+
+            val amountLong = rawAmount.toLongOrNull() ?: 0L  // Fallback to 0 if parsing fails
+
             intent.putExtra("transaction_id", transactionId)
             intent.putExtra("wallet_id", walletId)
             intent.putExtra("title", titleTextView.text.toString())
             intent.putExtra("category", categoryTextView.text.toString())
-            intent.putExtra("amount", amountTextView.text.toString().removePrefix("Rp. ").toLong())
+            intent.putExtra("amount", amountLong)  // Pass parsed amount
             intent.putExtra("date", dateTextView.text.toString())
             intent.putExtra("note", noteTextView.text.toString())
             intent.putExtra("transaction_type", transactionTypeTextView.text.toString())
 
             startActivity(intent)
         }
+
         findViewById<Button>(R.id.delete_transaction_button).setOnClickListener {
             deleteTransaction(walletId, transactionId)
         }
