@@ -5,6 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 class WalletAdapter (
     private var wallets: List<WalletDetail>
@@ -26,8 +29,16 @@ class WalletAdapter (
             val balanceView = itemView.findViewById<TextView>(R.id.text_wallet_balance)
 
             nameView.text = wallet.name
-            balanceView.text = "Rp ${wallet.balance}"
+            balanceView.text = formatToRupiah(wallet.balance)
         }
+
+        private fun formatToRupiah(amount: Long): String {
+            val symbols = DecimalFormatSymbols(Locale("id", "ID"))  // Indonesian locale
+            symbols.groupingSeparator = '.'
+            val decimalFormat = DecimalFormat("#,###", symbols)
+            return "Rp " + decimalFormat.format(amount)
+        }
+
     }
     fun getItemAtPosition(position: Int): WalletDetail {
         return wallets[position]
@@ -37,6 +48,8 @@ class WalletAdapter (
         wallets = newWallets
         notifyDataSetChanged()
     }
+
+
 
 
 }

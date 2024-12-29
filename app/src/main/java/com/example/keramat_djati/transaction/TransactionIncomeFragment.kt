@@ -22,6 +22,8 @@ import com.example.keramat_djati.MainActivity
 import com.example.keramat_djati.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.util.Calendar
 import java.util.Locale
 
@@ -66,26 +68,79 @@ class TransactionIncomeFragment : Fragment() {
         view.findViewById<EditText>(R.id.income_title).setText(viewModel.title.value)
         view.findViewById<EditText>(R.id.income_note).setText(viewModel.note.value)
         view.findViewById<EditText>(R.id.income_date).setText(viewModel.date.value)
-        view.findViewById<EditText>(R.id.income_amount).setText(viewModel.amount.value?.toString())
-
+        view.findViewById<EditText>(R.id.income_amount).setText(
+            if (viewModel.amount.value != null && viewModel.amount.value != 0L) {
+                viewModel.amount.value.toString()
+            } else {
+                ""
+            }
+        )
         val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_income_categories)
         val category = viewModel.categoryType.value
         val position = (spinnerCategories.adapter as ArrayAdapter<String>).getPosition(category)
         spinnerCategories.setSelection(position)
 
         view.findViewById<Button>(R.id.save_button).setOnClickListener {
-            if (areRequiredFieldsFilled()) {
+            val enteredAmount = getPlainAmount(view.findViewById(R.id.income_amount))
+            if (enteredAmount > 0) {
+                viewModel.amount.value = enteredAmount
                 viewModel.setCurrentDateTime()
                 (activity as? TransactionActivityHost)?.saveTransactionToFirestore()
             } else {
-                Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
             }
         }
+
 
         view.findViewById<Button>(R.id.cancel_button).setOnClickListener {
             navigateToMainActivity()
         }
     }
+
+    private fun formatNumber(number: Long): String {
+        val symbols = DecimalFormatSymbols(Locale.US)
+        val decimalFormat = DecimalFormat("#,###", symbols)
+        return decimalFormat.format(number)
+    }
+
+    fun getPlainAmount(editText: EditText): Long {
+        val rawInput = editText.text.toString()
+        return try {
+            rawInput.replace(",", "").toLong()
+        } catch (e: NumberFormatException) {
+            0L  // Return 0 if the input is invalid
+        }
+    }
+    private var current = ""
+
+    private fun setupAmountFormatting(editText: EditText) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString() != current) {
+                    editText.removeTextChangedListener(this)
+
+                    // Remove non-numeric characters and format the number
+                    val cleanString = s.toString().replace(",", "")
+
+                    if (cleanString.isNotEmpty()) {
+                        val parsed = cleanString.toLong()
+                        val formatted = formatNumber(parsed)
+
+                        current = formatted
+                        editText.setText(formatted)
+                        editText.setSelection(formatted.length)
+                    }
+
+                    editText.addTextChangedListener(this)
+                }
+            }
+        })
+    }
+
 
 
     private fun navigateToMainActivity() {
@@ -105,9 +160,13 @@ class TransactionIncomeFragment : Fragment() {
 
 
     private fun setupUIBindings(view: View) {
-        view.findViewById<EditText>(R.id.income_amount).apply {
-            afterTextChanged { viewModel.amount.value = it.toLongOrNull() ?: 0L }
+        val incomeAmountEditText = view.findViewById<EditText>(R.id.income_amount)
+        setupAmountFormatting(incomeAmountEditText)  // Apply number formatting
+
+        incomeAmountEditText.afterTextChanged {
+            viewModel.amount.value = getPlainAmount(incomeAmountEditText)
         }
+
         view.findViewById<EditText>(R.id.income_title).apply {
             afterTextChanged { viewModel.title.value = it }
         }
@@ -117,16 +176,8 @@ class TransactionIncomeFragment : Fragment() {
         view.findViewById<EditText>(R.id.income_note).apply {
             afterTextChanged { viewModel.note.value = it }
         }
-        view.findViewById<Spinner>(R.id.spinner_income_categories).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedCategory = categories[position]
-                viewModel.category.value = selectedCategory.name
-                viewModel.categoryId.value = selectedCategory.id
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
     }
+
 
     /**
      * Helper function to simplify setting text watchers that update LiveData.

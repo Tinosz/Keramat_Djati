@@ -7,6 +7,9 @@ import android.widget.TextView
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 class TransactionAdapter(
     private var transactions: List<Transaction>,
@@ -47,9 +50,20 @@ class TransactionAdapter(
             val amountPrefix = if (isIncome) "+Rp " else "-Rp "
             val colorRes = if (isIncome) R.color.main_green else R.color.red
 
-            amountView.text = "$amountPrefix${Math.abs(transaction.amount)}"
+            // Format the transaction amount with commas
+            val formattedAmount = formatToRupiah(Math.abs(transaction.amount))
+
+            amountView.text = "$amountPrefix$formattedAmount"
             amountView.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
             colorIndicator.setBackgroundColor(ContextCompat.getColor(itemView.context, colorRes))
+        }
+
+
+        private fun formatToRupiah(amount: Long): String {
+            val symbols = DecimalFormatSymbols(Locale("id", "ID"))  // Indonesian locale
+            symbols.groupingSeparator = '.'
+            val decimalFormat = DecimalFormat("#,###", symbols)
+            return decimalFormat.format(amount)
         }
     }
 

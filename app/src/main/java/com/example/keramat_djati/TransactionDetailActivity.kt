@@ -12,6 +12,9 @@ import com.example.keramat_djati.transaction.TransactionActivityHost
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 class TransactionDetailActivity : AppCompatActivity() {
 
@@ -71,6 +74,13 @@ class TransactionDetailActivity : AppCompatActivity() {
             deleteTransaction(walletId, transactionId)
         }
 
+    }
+
+    private fun formatToRupiah(amount: Long): String {
+        val symbols = DecimalFormatSymbols(Locale("id", "ID"))  // Indonesian locale
+        symbols.groupingSeparator = '.'
+        val decimalFormat = DecimalFormat("#,###", symbols)
+        return "Rp. " + decimalFormat.format(amount)
     }
 
     private fun deleteTransaction(walletId: String, transactionId: String) {
@@ -177,7 +187,9 @@ class TransactionDetailActivity : AppCompatActivity() {
 
         dateTextView.text = date
         transactionTypeTextView.text = if (isExpense) "Expense Transaction" else "Income Transaction"
-        amountTextView.text = "Rp. $amount"
+
+        // Format the amount with commas
+        amountTextView.text = formatToRupiah(amount)
 
         val backgroundColor = if (isExpense) R.color.red else R.color.main_green
         val textColor = if (isExpense) R.color.red else R.color.main_green
@@ -189,4 +201,5 @@ class TransactionDetailActivity : AppCompatActivity() {
         categoryTextView.text = category
         noteTextView.text = note
     }
+
 }

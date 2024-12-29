@@ -21,6 +21,8 @@ import com.example.keramat_djati.MainActivity
 import com.example.keramat_djati.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.util.Calendar
 import java.util.Locale
 
@@ -69,12 +71,64 @@ class TransactionExpenseFragment : Fragment() {
         }
     }
 
+    private fun formatNumber(number: Long): String {
+        val symbols = DecimalFormatSymbols(Locale.US)
+        val decimalFormat = DecimalFormat("#,###", symbols)
+        return decimalFormat.format(number)
+    }
+
+    fun getPlainAmount(editText: EditText): Long {
+        val rawInput = editText.text.toString()
+        return try {
+            rawInput.replace(",", "").toLong()
+        } catch (e: NumberFormatException) {
+            0L  // Return 0 if the input is invalid
+        }
+    }
+
+    private var current = ""
+
+    private fun setupAmountFormatting(editText: EditText) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString() != current) {
+                    editText.removeTextChangedListener(this)
+
+                    // Remove non-numeric characters and format the number
+                    val cleanString = s.toString().replace(",", "")
+
+                    if (cleanString.isNotEmpty()) {
+                        val parsed = cleanString.toLong()
+                        val formatted = formatNumber(parsed)
+
+                        current = formatted
+                        editText.setText(formatted)
+                        editText.setSelection(formatted.length)
+                    }
+
+                    editText.addTextChangedListener(this)
+                }
+            }
+        })
+    }
+
+
     private fun prefillFormWithViewModelData(view: View) {
         // Set the data from ViewModel to the UI elements
         view.findViewById<EditText>(R.id.expense_title).setText(viewModel.title.value)
         view.findViewById<EditText>(R.id.expense_note).setText(viewModel.note.value)
         view.findViewById<EditText>(R.id.expense_date).setText(viewModel.date.value)
-        view.findViewById<EditText>(R.id.expense_amount).setText(viewModel.amount.value?.toString())
+        view.findViewById<EditText>(R.id.expense_amount).setText(
+            if (viewModel.amount.value != null && viewModel.amount.value != 0L) {
+                viewModel.amount.value.toString()
+            } else {
+                ""
+            }
+        )
 
         // Set the spinner to the correct category
         val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_expense_categories)
@@ -99,34 +153,26 @@ class TransactionExpenseFragment : Fragment() {
     }
 
     private fun setupUIBindings(view: View) {
-        // Bind EditText fields to the ViewModel
-        view.findViewById<EditText>(R.id.expense_amount).afterTextChanged {
-            viewModel.amount.value = it.toLongOrNull() ?: 0L
+        val expenseAmountEditText = view.findViewById<EditText>(R.id.expense_amount)
+        setupAmountFormatting(expenseAmountEditText)  // Apply number formatting
+
+        expenseAmountEditText.afterTextChanged {
+            viewModel.amount.value = getPlainAmount(expenseAmountEditText)
         }
 
-        view.findViewById<EditText>(R.id.expense_title).afterTextChanged {
-            viewModel.title.value = it
+        view.findViewById<EditText>(R.id.expense_title).apply {
+            afterTextChanged { viewModel.title.value = it }
         }
 
-        view.findViewById<EditText>(R.id.expense_date).afterTextChanged {
-            viewModel.date.value = it
+        view.findViewById<EditText>(R.id.expense_date).apply {
+            afterTextChanged { viewModel.date.value = it }
         }
 
-        view.findViewById<EditText>(R.id.expense_note).afterTextChanged {
-            viewModel.note.value = it
+        view.findViewById<EditText>(R.id.expense_note).apply {
+            afterTextChanged { viewModel.note.value = it }
         }
-
-        view.findViewById<Spinner>(R.id.spinner_expense_categories).onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                    val selectedCategory = categories[position]
-                    viewModel.category.value = selectedCategory.name
-                    viewModel.categoryId.value = selectedCategory.id
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>) {}
-            }
     }
+
 
     fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
