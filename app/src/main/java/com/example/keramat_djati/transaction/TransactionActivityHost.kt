@@ -156,7 +156,6 @@ class TransactionActivityHost : AppCompatActivity() {
                 }
             }
         } else {
-            // If no transaction ID exists, create a new transaction
             transactionCollectionRef.add(transactionData)
                 .addOnSuccessListener {
                     updateWalletBalance(userId, walletId, viewModel.oldWalletId.value ?: "", 0L, viewModel.amount.value ?: 0L, viewModel.categoryType.value ?: "Expense")

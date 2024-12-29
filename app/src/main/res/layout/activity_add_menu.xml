@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    tools:context=".AddMenu">
+
+    <!-- Top Row - Two Boxes Side by Side -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Box 1 -->
+        <!-- Box 1 -->
+        <LinearLayout
+            android:id="@+id/add_wallet_button"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
+            android:background="@drawable/clickable_black_border"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginEnd="16dp">
+
+            <ImageView
+                android:id="@+id/icon_add_wallet"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/wallet_icon"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/text_add_wallet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Wallet"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- Box 2 -->
+        <LinearLayout
+            android:id="@+id/add_category_button"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
+            android:background="@drawable/clickable_black_border"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+
+            <ImageView
+                android:id="@+id/icon_add_category"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/categories"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/text_add_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Category"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:gravity="center" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Bottom Row - One Box Centered -->
+    <LinearLayout
+        android:id="@+id/add_transaction_button"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/clickable_black_border"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/icon_add_receipt"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/transaction"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/text_add_receipt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Transaction"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:gravity="center" />
+    </LinearLayout>
+
+</LinearLayout>

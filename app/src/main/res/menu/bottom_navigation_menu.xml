@@ -7,11 +7,15 @@
         android:icon="@drawable/ic_wallet"
         app:itemIconTint="@color/light_green2"
         android:title="Transactions" />
-    <item
-        android:id="@+id/addTransactionFragment"
-        android:icon="@drawable/ic_add"
+<!--    <item-->
+<!--        android:id="@+id/addTransactionFragment"-->
+<!--        android:icon="@drawable/ic_add"-->
+<!--        app:itemIconTint="@color/light_green2"-->
+<!--        android:title="Add Transaction" />-->
+    <item android:id="@+id/ReceiptMenu"
+        android:icon="@drawable/receipt"
         app:itemIconTint="@color/light_green2"
-        android:title="Add" />
+        android:title="Receipts"/>
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"

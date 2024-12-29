@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.example.keramat_djati.transaction.TransactionActivityHost
 import com.example.keramat_djati.transaction.TransactionViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -58,6 +59,7 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
         walletAdapter = WalletAdapter(listOf())
         walletRecyclerView.adapter = walletAdapter
 
+
         walletRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -83,19 +85,21 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
         }
         )
 
-        val addWalletButton: ImageButton = view.findViewById(R.id.button_add_wallet)
-        addWalletButton.setOnClickListener {
-            // Start the TransactionActivityHost when the button is clicked
-            val intent = Intent(activity, CreateWalletActivity::class.java)
-            startActivity(intent)
-        }
 
         fetchFirstWalletAndTransactions()
+
+        val fabAddClickable = view.findViewById<FloatingActionButton>(R.id.fabAddCLickablet)
+        fabAddClickable.setOnClickListener {
+            val intent = Intent(activity, AddMenu::class.java)
+            startActivity(intent)
+        }
 
 
 
         return view
     }
+
+
 
     override fun onResume(){
         super.onResume()

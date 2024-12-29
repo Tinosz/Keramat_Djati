@@ -21,7 +21,7 @@ class TransactionDetailActivity : AppCompatActivity() {
     private lateinit var titleTextView: TextView
     private lateinit var categoryTextView: TextView
     private lateinit var noteTextView: TextView
-    private lateinit var headerTitle: FrameLayout // Ensure this matches with XML
+    private lateinit var headerTitle: FrameLayout
     private lateinit var walletNameTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {

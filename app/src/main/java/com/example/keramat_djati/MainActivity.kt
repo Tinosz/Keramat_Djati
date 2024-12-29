@@ -33,8 +33,12 @@ class MainActivity : AppCompatActivity() {
                     // Uses the Navigation Component to navigate between fragments
                     NavigationUI.onNavDestinationSelected(item, navController)
                 }
-                R.id.addTransactionFragment -> {
-                    startActivity(Intent(this, TransactionActivityHost::class.java))
+//                R.id.addTransactionFragment -> {
+//                    startActivity(Intent(this, TransactionActivityHost::class.java))
+//                    true
+//                }
+                R.id.ReceiptMenu -> {
+                    startActivity(Intent(this, SaveReceiptActivity::class.java))
                     true
                 }
                 else -> false
