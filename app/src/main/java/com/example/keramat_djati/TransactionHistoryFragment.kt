@@ -88,6 +88,9 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
 
         fetchFirstWalletAndTransactions()
 
+        fetchWalletsInRealTime()
+
+
         val fabAddClickable = view.findViewById<FloatingActionButton>(R.id.fabAddCLickablet)
         fabAddClickable.setOnClickListener {
             val intent = Intent(activity, AddMenu::class.java)
@@ -139,6 +142,40 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
         walletAdapter.updateWallets(wallets)
     }
 
+    private var walletListener: ListenerRegistration? = null
+
+    private fun fetchWalletsInRealTime() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+
+        walletListener?.remove()  // Remove the existing listener before adding a new one
+
+        walletListener = db.collection("accounts").document(userId)
+            .collection("wallets")
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    Toast.makeText(context, "Failed to listen for wallet changes.", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                snapshots?.let {
+                    val walletDetails = it.documents.map { doc ->
+                        WalletDetail(
+                            id = doc.id,
+                            name = doc.getString("name") ?: "Unnamed Wallet",
+                            balance = doc.getLong("amount") ?: 0L
+                        )
+                    }
+                    updateWalletsList(walletDetails)
+
+                    if (walletDetails.isNotEmpty()) {
+                        fetchTransactions(walletDetails.first().id)
+                    }
+                }
+            }
+    }
+
+
 
 
     override fun onDestroyView() {
@@ -146,6 +183,8 @@ class TransactionHistoryFragment : Fragment(), TransactionAdapter.OnItemClickLis
         // Remove Firestore listeners when the fragment is destroyed
         incomeListener?.remove()
         expenseListener?.remove()
+        walletListener?.remove()  // Clean up listener when fragment is destroyed
+
     }
 
     private fun fetchTransactions(walletId: String) {
