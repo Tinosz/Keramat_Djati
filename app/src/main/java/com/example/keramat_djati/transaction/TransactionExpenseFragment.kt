@@ -78,13 +78,18 @@ class TransactionExpenseFragment : Fragment() {
     }
 
     fun getPlainAmount(editText: EditText): Long {
-        val rawInput = editText.text.toString()
-        return try {
-            rawInput.replace(",", "").toLong()
-        } catch (e: NumberFormatException) {
-            0L  // Return 0 if the input is invalid
+        val rawInput = editText.text.toString().replace(",", "").trim()
+        return if (rawInput.isEmpty()) {
+            0L
+        } else {
+            try {
+                rawInput.toLong()
+            } catch (e: NumberFormatException) {
+                0L
+            }
         }
     }
+
 
     private var current = ""
 
@@ -171,7 +176,18 @@ class TransactionExpenseFragment : Fragment() {
         view.findViewById<EditText>(R.id.expense_note).apply {
             afterTextChanged { viewModel.note.value = it }
         }
+
+        val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_expense_categories)
+        spinnerCategories.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                viewModel.category.value = categories[position].name
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                viewModel.category.value = null
+            }
+        }
     }
+
 
 
     fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {

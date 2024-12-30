@@ -44,6 +44,8 @@ android {
     }
 
 
+
+
 }
 
 dependencies {
@@ -79,6 +81,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation ("com.github.bumptech.glide:glide:4.13.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.13.0")
+    implementation(libs.mpandroidchart)
     implementation(libs.androidx.coordinatorlayout)
 
 

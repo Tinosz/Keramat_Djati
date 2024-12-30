@@ -3,6 +3,7 @@ package com.example.keramat_djati
 import android.Manifest
 import android.os.Environment
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -64,12 +65,10 @@ class ReceiptDetailActivity : AppCompatActivity() {
     }
 
     private fun checkPermissionAndDownloadPdf() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-        } else {
-            downloadImageAndConvertToPdf()
-        }
+        // Directly download and save to internal storage, no permission needed
+        downloadImageAndConvertToPdf()
     }
+
 
     private fun downloadImageAndConvertToPdf() {
         val imageUrl = intent.getStringExtra("imageUrl")
@@ -91,23 +90,36 @@ class ReceiptDetailActivity : AppCompatActivity() {
         page.canvas.drawBitmap(bitmap, 0f, 0f, null)
         pdfDocument.finishPage(page)
 
-        // Check if external storage is available
-        if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val pdfFile = File(downloadsFolder, "DownloadedImage.pdf")
+        // Save to internal storage
+        val pdfFile = File(filesDir, "Receipt_${System.currentTimeMillis()}.pdf")
 
-            try {
-                pdfDocument.writeTo(FileOutputStream(pdfFile))
-                Toast.makeText(this, "PDF saved to ${pdfFile.absolutePath}", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed to save PDF: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-            } finally {
-                pdfDocument.close()
-            }
-        } else {
-            Toast.makeText(this, "External storage is not available", Toast.LENGTH_LONG).show()
+        try {
+            pdfDocument.writeTo(FileOutputStream(pdfFile))
+            Toast.makeText(this, "PDF saved to internal storage", Toast.LENGTH_LONG).show()
+            sharePdf(pdfFile)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to save PDF: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        } finally {
+            pdfDocument.close()
         }
     }
+
+    private fun sharePdf(pdfFile: File) {
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            this,
+            "${applicationContext.packageName}.provider",
+            pdfFile
+        )
+
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)  // Grant temporary read access
+        }
+
+        startActivity(Intent.createChooser(shareIntent, "Share PDF via"))
+    }
+
 
 
     private fun showDatePicker() {
