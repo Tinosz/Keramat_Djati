@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -58,9 +59,20 @@ class TransactionExpenseFragment : Fragment() {
         prefillFormWithViewModelData(view)
 
         view.findViewById<Button>(R.id.save_button).setOnClickListener {
+            val enteredAmount = getPlainAmount(view.findViewById(R.id.expense_amount))
             if (areRequiredFieldsFilled()) {
-                viewModel.setCurrentDateTime()
-                (activity as? TransactionActivityHost)?.saveTransactionToFirestore()
+                if (enteredAmount > 0) {
+                    viewModel.amount.value = enteredAmount
+
+                    // Only set current date if no date was selected
+                    if (viewModel.date.value.isNullOrEmpty()) {
+                        viewModel.setCurrentDateTime()
+                    }
+
+                    (activity as? TransactionActivityHost)?.saveTransactionToFirestore()
+                } else {
+                    Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
             }
@@ -242,8 +254,19 @@ class TransactionExpenseFragment : Fragment() {
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, monthOfYear, dayOfMonth ->
-                val dateString = String.format(Locale.US, "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth)
+                // Create a Calendar instance to set the selected date
+                val selectedDate = Calendar.getInstance()
+                selectedDate.set(year, monthOfYear, dayOfMonth)
+
+                // Use the same date format as TransactionViewModel
+                val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.US)
+                val dateString = dateFormat.format(selectedDate.time)
+
+                // Update the EditText with the formatted date
                 dateEditText.setText(dateString)
+
+                // Update ViewModel with the selected date
+                viewModel.date.value = dateString
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -254,4 +277,5 @@ class TransactionExpenseFragment : Fragment() {
             datePickerDialog.show()
         }
     }
+
 }

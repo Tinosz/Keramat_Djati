@@ -27,6 +27,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KERAMAT_DJATI"
         tools:targetApi="31">
+        <activity
+            android:name=".CategoryEditForm"
+            android:exported="false" />
+        <activity
+            android:name=".AddCategoryForm"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -36,6 +43,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+
         <activity
             android:name=".AddMenu"
             android:exported="false"
