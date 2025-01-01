@@ -187,6 +187,15 @@ class TransactionIncomeFragment : Fragment() {
         view.findViewById<EditText>(R.id.income_note).apply {
             afterTextChanged { viewModel.note.value = it }
         }
+        val spinnerCategories = view.findViewById<Spinner>(R.id.spinner_income_categories)
+        spinnerCategories.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                viewModel.category.value = categories[position].name
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                viewModel.category.value = null
+            }
+        }
     }
 
 
